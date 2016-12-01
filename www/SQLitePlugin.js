@@ -684,9 +684,13 @@ Contact for commercial license: info@litehelpers.net
         throw newSQLError('Sorry missing mandatory open arguments object in openDatabase call');
       }
       if (args[0].constructor === String) {
-        throw newSQLError('Sorry first openDatabase argument must be an object');
+        openargs = {
+          name: args[0]
+        };
+        args = [openargs];
+      } else {
+        openargs = args[0];
       }
-      openargs = args[0];
       if (!openargs.name) {
         throw newSQLError('Database name value is missing in openDatabase call');
       }
@@ -721,7 +725,11 @@ Contact for commercial license: info@litehelpers.net
       var args, dblocation, dbname;
       args = {};
       if (first.constructor === String) {
-        throw newSQLError('Sorry first deleteDatabase argument must be an object');
+        dbname = first;
+        first = {
+          location: 'default'
+        };
+        args.path = dbname;
       } else {
         if (!(first && first['name'])) {
           throw new Error("Please specify db name");

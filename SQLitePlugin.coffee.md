@@ -721,29 +721,13 @@
         if args.length < 1 || !args[0]
           throw newSQLError 'Sorry missing mandatory open arguments object in openDatabase call'
 
-        #first = args[0]
-        #openargs = null
-        #okcb = null
-        #errorcb = null
-
-        #if first.constructor == String
-        #  openargs = {name: first}
-
-        #  if args.length >= 5
-        #    okcb = args[4]
-        #    if args.length > 5 then errorcb = args[5]
-
-        #else
-        #  openargs = first
-
-        #  if args.length >= 2
-        #    okcb = args[1]
-        #    if args.length > 2 then errorcb = args[2]
-
+        # XXX TBD HACKISH:
         if args[0].constructor == String
-          throw newSQLError 'Sorry first openDatabase argument must be an object'
+          openargs = { name: args[0] }
+          args = [openargs]
 
-        openargs = args[0]
+        else
+          openargs = args[0]
 
         # check here
         if !openargs.name
@@ -788,11 +772,10 @@
         args = {}
 
         if first.constructor == String
-          #console.log "delete db name: #{first}"
-          #args.path = first
-          #args.dblocation = dblocations[0]
-          #args.dblocation = dblocations[2]
-          throw newSQLError 'Sorry first deleteDatabase argument must be an object'
+          # XXX TBD HACKISH:
+          dbname = first
+          first = { location: 'default' }
+          args.path = dbname
 
         else
           #console.log "delete db args: #{JSON.stringify first}"

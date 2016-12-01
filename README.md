@@ -663,15 +663,16 @@ where the `iosDatabaseLocation` option may be set to one of the following choice
 
 **WARNING:** Again, the new "default" iosDatabaseLocation value is *NOT* the same as the old default location and would break an upgrade for an app using the old default value (0) on iOS.
 
-*ALTERNATIVE (deprecated):*
+*Alternatives (DEPRECATED):*
+
+- `var db = window.sqlitePlugin.openDatabase("myDatabase.db", "1.0", "Demo", -1);`
+
 - `var db = window.sqlitePlugin.openDatabase({name: "my.db", location: 1}, successcb, errorcb);`
 
 with the `location` option set to one the following choices (affects iOS *only*):
 - `0`: `Documents` - visible to iTunes and backed up by iCloud
 - `1`: `Library` - backed up by iCloud, *NOT* visible to iTunes
 - `2` (new default): `Library/LocalDatabase` - *NOT* visible to iTunes and *NOT* backed up by iCloud (same as using "default")
-
-No longer supported (see tip below to overwrite `window.openDatabase`): ~~`var db = window.sqlitePlugin.openDatabase("myDatabase.db", "1.0", "Demo", -1);`~~
 
 **IMPORTANT:** Please wait for the 'deviceready' event, as in the following example:
 
@@ -1107,6 +1108,12 @@ window.sqlitePlugin.deleteDatabase({name: 'my.db', location: 'default'}, success
 ```
 
 with `location` or `iosDatabaseLocation` parameter *optional* as described above for `openDatabase` (affects iOS/macOS *only*)
+
+**DEPRECATED:**
+
+```js
+window.sqlitePlugin.deleteDatabase(name: 'my.db', successcb, errorcb);
+```
 
 **BUG:** When a database is deleted, any queued transactions for that database are left hanging. All pending transactions should be errored when a database is deleted.
 

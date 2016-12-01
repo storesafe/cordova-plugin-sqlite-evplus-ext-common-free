@@ -52,7 +52,7 @@ var mytests = function() {
 
     var suiteName = 'plugin: ';
 
-        it(suiteName + 'Open plugin database with Web SQL parameters (REJECTED with exception)', function(done) {
+        xit(suiteName + 'Open plugin database with Web SQL parameters (REJECTED with exception)', function(done) {
           try {
             var db = window.sqlitePlugin.openDatabase('open-with-web-sql-parameters-test.db', "1.0", "Demo", DEFAULT_SIZE);
 
@@ -388,7 +388,7 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-        it(suiteName + 'sqlitePlugin.deleteDatabase with string parameter (REJECTED with exception)', function(done) {
+        xit(suiteName + 'sqlitePlugin.deleteDatabase with string parameter (REJECTED with exception)', function(done) {
           try {
             window.sqlitePlugin.deleteDatabase('my.db', function() {
               // NOT EXPECTED:
@@ -1090,11 +1090,11 @@ var mytests = function() {
           // asynch test coming up
           stop(1);
 
-          openDatabase({name: dbName, iosDatabaseLocation: 'Library'}, function(db1) {
+          openDatabase({name: dbName}, function(db1) {
 
             db1.close(function () {
-              deleteDatabase({name: dbName, iosDatabaseLocation: 'Library'}, function () {
-                openDatabase({name: dbName, iosDatabaseLocation: 'Library'}, function(db) {
+              deleteDatabase(dbName, function () {
+                openDatabase({name: dbName}, function(db) {
                   db.readTransaction(function (tx) {
                     tx.executeSql('SELECT 1', [], function (tx, results) {
                       ok(true, 'database re-opened succesfully');
