@@ -94,7 +94,7 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-        it(suiteName + 'Open with no location setting (REJECTED with exception)', function(done) {
+        xit(suiteName + 'Open with no location setting (REJECTED with exception)', function(done) {
           try {
             window.sqlitePlugin.openDatabase({ name: 'open-with-no-location-setting.db' }, function(db) {
               // NOT EXPECTED:
@@ -286,7 +286,7 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-        it(suiteName + 'Open with location: null (REJECTED with exception)', function(done) {
+        xit(suiteName + 'Open with location: null (REJECTED with exception)', function(done) {
           try {
             window.sqlitePlugin.openDatabase({ name: 'open-with-location-null.db', location: null }, function(db) {
               // NOT EXPECTED:
@@ -308,7 +308,7 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-        it(suiteName + 'Open with iosDatabaseLocation: null (REJECTED with exception)', function(done) {
+        xit(suiteName + 'Open with iosDatabaseLocation: null (REJECTED with exception)', function(done) {
           try {
             window.sqlitePlugin.openDatabase({
               name: 'open-with-iosDatabaseLocation-null.db',
@@ -365,7 +365,7 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-        it(suiteName + 'sqlitePlugin.deleteDatabase with no location setting (REJECTED with exception)', function(done) {
+        xit(suiteName + 'sqlitePlugin.deleteDatabase with no location setting (REJECTED with exception)', function(done) {
           try {
             // FUTURE TBD test without callbacks?
             window.sqlitePlugin.deleteDatabase({name: 'my.db'}, function() {
@@ -1001,16 +1001,16 @@ var mytests = function() {
         });
 
         // Needed to support some large-scale applications:
-        test_it(suiteName + " delete then re-open (location: 'default') allows subsequent queries to run", function () {
+        test_it(suiteName + " delete then re-open (no location setting) allows subsequent queries to run", function () {
           var dbName = "Database-delete-and-Reopen.db";
 
           // async test coming up
           stop(1);
 
-          var db = openDatabase({name: dbName, location: 'default'}, function () {
+          var db = openDatabase({name: dbName}, function () {
             // success CB
-            deleteDatabase({name: dbName, location: 'default'}, function () {
-              db = openDatabase({name: dbName, location: 'default'}, function () {
+            deleteDatabase({name: dbName}, function () {
+              db = openDatabase({name: dbName}, function () {
                 db.readTransaction(function (tx) {
                   tx.executeSql('SELECT 1', [], function (tx, results) {
                     ok(true, 'database re-opened succesfully');

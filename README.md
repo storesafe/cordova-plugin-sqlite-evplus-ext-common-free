@@ -117,7 +117,6 @@ See the [Sample section](#sample) for a sample with a more detailed explanation.
   - Cordova CLI older than `6.4.0` include an old version of cordova-ios that requires an extra `cordova prepare` step;
   - Cordova versions older than `6.0.0` are missing the `cordova-ios@4.0.0` security fixes.
 - Use of other systems such as Cordova Plugman, PhoneGap CLI, PhoneGap Build, and Intel XDK is *not* supported since they do not honor the `before_plugin_install` hook. These are supported by: [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free)
-- The iOS database location is now mandatory, as documented below.
 - SQLite version `3.15.2` included with the following defines:
   - `SQLITE_TEMP_STORE=2`
   - `SQLITE_THREADSAFE=2`
@@ -640,6 +639,12 @@ See the [Sample section](#sample) for a sample with detailed explanations.
 To open a database access handle object (in the **new** default location):
 
 ```js
+var db = window.sqlitePlugin.openDatabase({name: 'my.db'}, successcb, errorcb);
+```
+
+or
+
+```js
 var db = window.sqlitePlugin.openDatabase({name: 'my.db', location: 'default'}, successcb, errorcb);
 ```
 
@@ -662,9 +667,9 @@ where the `iosDatabaseLocation` option may be set to one of the following choice
 - `var db = window.sqlitePlugin.openDatabase({name: "my.db", location: 1}, successcb, errorcb);`
 
 with the `location` option set to one the following choices (affects iOS *only*):
-- `0` ~~(default)~~: `Documents` - visible to iTunes and backed up by iCloud
+- `0`: `Documents` - visible to iTunes and backed up by iCloud
 - `1`: `Library` - backed up by iCloud, *NOT* visible to iTunes
-- `2`: `Library/LocalDatabase` - *NOT* visible to iTunes and *NOT* backed up by iCloud (same as using "default")
+- `2` (new default): `Library/LocalDatabase` - *NOT* visible to iTunes and *NOT* backed up by iCloud (same as using "default")
 
 No longer supported (see tip below to overwrite `window.openDatabase`): ~~`var db = window.sqlitePlugin.openDatabase("myDatabase.db", "1.0", "Demo", -1);`~~
 
@@ -1092,10 +1097,16 @@ db.executeSql("SELECT LENGTH('tenletters') AS stringlength", [], function (res) 
 ## Delete a database
 
 ```js
+window.sqlitePlugin.deleteDatabase({name: 'my.db'}, successcb, errorcb);
+```
+
+or
+
+```js
 window.sqlitePlugin.deleteDatabase({name: 'my.db', location: 'default'}, successcb, errorcb);
 ```
 
-with `location` or `iosDatabaseLocation` parameter *required* as described above for `openDatabase` (affects iOS/macOS *only*)
+with `location` or `iosDatabaseLocation` parameter *optional* as described above for `openDatabase` (affects iOS/macOS *only*)
 
 **BUG:** When a database is deleted, any queued transactions for that database are left hanging. All pending transactions should be errored when a database is deleted.
 

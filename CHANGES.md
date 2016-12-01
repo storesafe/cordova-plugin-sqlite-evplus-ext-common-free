@@ -1,5 +1,9 @@
 # Changes
 
+# cordova-sqlite-evplus-ext-free 0.2.0-pre1
+
+- Drop openDatabase/deleteDatabase location setting requirement
+
 # cordova-sqlite-evplus-ext-free 0.0.1
 
 ## cordova-sqlite-evcore-common-free 0.7.3
