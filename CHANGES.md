@@ -1,5 +1,7 @@
 # Changes
 
+# cordova-sqlite-evplus-ext-free 0.0.1
+
 ## cordova-sqlite-evcore-common-free 0.7.3
 
 - Use SQLite 3.15.2 for all platforms (no SQLITE_DEFAULT_PAGE_SIZE or SQLITE_DEFAULT_CACHE_SIZE defined in this version branch)

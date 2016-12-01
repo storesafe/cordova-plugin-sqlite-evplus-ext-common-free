@@ -1,24 +1,24 @@
-# Cordova/PhoneGap sqlite storage - free enterprise version with performance improvements for Android
+# Cordova/PhoneGap sqlite storage - premium enterprise version with performance improvements for Android and FUTURE TBD other extra features
 
 Native interface to sqlite in a Cordova/PhoneGap plugin for Android, iOS, macOS, and Windows 10 (UWP), with API similar to HTML5/[Web SQL API](http://www.w3.org/TR/webdatabase/).
 
 This version uses a special native C library to provide significantly better performance as well as memory usage improvements for Android.
 
-This version is available under GPL v3 (http://www.gnu.org/licenses/gpl.txt) or commercial license and includes components available under the MIT and Apache 2.0 licenses. Contact for commercial license: sales@litehelpers.net
+This version is available under GPL v3 (http://www.gnu.org/licenses/gpl.txt) or premium commercial license and includes components available under the MIT and Apache 2.0 licenses. Contact for commercial license: sales@litehelpers.net
 
-NOTE: Commercial licenses for [litehelpers / Cordova-sqlite-enterprise-free](https://github.com/litehelpers/Cordova-sqlite-enterprise-free) are valid for this version as well.
+**NOTICE:** Commercial licenses for [litehelpers / Cordova-sqlite-enterprise-free](https://github.com/litehelpers/Cordova-sqlite-enterprise-free) are **NOT** valid for this version. For an upgrade please contact <sales@litehelpers.net>.
 
-|Android Circle-CI (**full** suite)|iOS Travis-CI (missing open/close/delete tests)|
-|-----------------------|----------------------|
-|[![Circle CI](https://circleci.com/gh/litehelpers/Cordova-sqlite-evcore-common-free.svg?style=svg)](https://circleci.com/gh/litehelpers/Cordova-sqlite-evcore-common-free)|[![Build Status](https://travis-ci.org/litehelpers/Cordova-sqlite-evcore-common-free.svg)](https://travis-ci.org/litehelpers/Cordova-sqlite-evcore-common-free)|
+TBD Circle CI (Android)/Travis CI (iOS)
 
 ## About this version
 
-Free enterprise version with performance improvements for Android - common branch with external sqlite3 dependencies automatically installed by before_plugin_install hook
+Premium enterprise version with performance improvements for Android; FUTURE TBD worker support and other extra features to be added as needed for premium commercial license holders.
+
+TBD NOTE: This version branch has external sqlite3 dependencies that are installed by a before_plugin_install hook. FUTURE TBD sqlite3 dependencies will be included if needed by any commercial users for PhoneGap Build or any other build tools.
 
 <!-- END About this version -->
 
-## Available for hire
+## Services available
 
 The primary author and maintainer [@brodybits (Christopher J. Brody aka Chris Brody)](https://github.com/brodybits) is available for part-time contract assignments. Services available for this project include:
 
@@ -566,8 +566,8 @@ FUTURE TBD: Proper date/time handling will be further tested and documented at s
 
 ### Other versions
 
-- [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free) - Enhancements from this version with all dependencies included and support for arbitrary Android database location, support for PhoneGap CLI/PhoneGap Build/plugman/Intel XDK. (GPL or commercial license options)
-- [litehelpers / Cordova-sqlite-evplus-legacy-workers-free](https://github.com/litehelpers/Cordova-sqlite-evplus-legacy-workers-free) - version with support for web workers _(Android/iOS)_, includes internal memory improvements to support larger transactions (Android/iOS) and fix to support all Unicode characters (iOS) (GPL or premium commercial license options)
+- [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free) - Android performance enhancements and support for arbitrary Android database location with all dependencies included, support for PhoneGap CLI/PhoneGap Build/plugman/Intel XDK. (GPL or commercial license options)
+- [litehelpers / Cordova-sqlite-evplus-legacy-workers-free](https://github.com/litehelpers/Cordova-sqlite-evplus-legacy-workers-free) - version with support for web workers (Android/iOS), includes internal memory improvements to support larger transactions (Android/iOS) and fix to support all Unicode characters (iOS) (GPL or premium commercial license options)
 - [litehelpers / Cordova-sqlite-evplus-legacy-free](https://github.com/litehelpers/Cordova-sqlite-evplus-legacy-free) - internal memory improvements to support larger transactions (Android/iOS) and fix to support all Unicode characters (iOS) (GPL or special commercial license options)
 - [litehelpers / Cordova-sqlite-evplus-legacy-attach-detach-free](https://github.com/litehelpers/Cordova-sqlite-evplus-legacy-attach-detach-free) - version with support for ATTACH, includes internal memory improvements to support larger transactions (Android/iOS) and fix to support all Unicode characters (GPL or special commercial license options)
 - [litehelpers / Cordova-sqlite-storage](https://github.com/litehelpers/Cordova-sqlite-storage) - Cordova sqlite storage plugin _for Android/iOS/macOS/Windows 10_ with permissive licensing terms
