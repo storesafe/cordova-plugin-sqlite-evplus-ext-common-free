@@ -1,4 +1,3 @@
-
 /*
 License for this version: GPL v3 (http://www.gnu.org/licenses/gpl.txt) or commercial license.
 Contact for commercial license: info@litehelpers.net
@@ -112,7 +111,7 @@ Contact for commercial license: info@litehelpers.net
       this.startNextTransaction();
     } else {
       if (this.dbname in this.openDBs) {
-        console.log('new transaction is waiting for open operation');
+        console.log('new transaction is queued, waiting for open operation to finish');
       } else {
         console.log('database is closed, new transaction is [stuck] waiting until db is opened again!');
       }
@@ -172,7 +171,7 @@ Contact for commercial license: info@litehelpers.net
   };
 
   SQLitePlugin.prototype.open = function(success, error) {
-    var openerrorcb, opensuccesscb;
+    var openerrorcb, opensuccesscb, step2;
     if (this.dbname in this.openDBs) {
       console.log('database already open: ' + this.dbname);
       this.dbid = this.dbidmap[this.dbname];
@@ -221,7 +220,16 @@ Contact for commercial license: info@litehelpers.net
       this.openDBs[this.dbname] = DB_STATE_INIT;
       this.dbidmap[this.dbname] = this.dbid = null;
       this.fjmap[this.dbname] = false;
-      cordova.exec(opensuccesscb, openerrorcb, "SQLitePlugin", "open", [this.openargs]);
+      step2 = (function(_this) {
+        return function() {
+          cordova.exec(opensuccesscb, openerrorcb, "SQLitePlugin", "open", [_this.openargs]);
+        };
+      })(this);
+      cordova.exec(step2, step2, 'SQLitePlugin', 'close', [
+        {
+          path: this.dbname
+        }
+      ]);
     }
   };
 
@@ -374,7 +382,7 @@ Contact for commercial license: info@litehelpers.net
       for (l = 0, len1 = values.length; l < len1; l++) {
         v = values[l];
         t = typeof v;
-        params.push((v === null || v === void 0 || t === 'number' || t === 'string' ? v : v.toString()));
+        params.push((v === null || v === void 0 ? null : t === 'number' || t === 'string' ? v : v.toString()));
       }
     }
     this.executes.push({
@@ -607,15 +615,15 @@ Contact for commercial license: info@litehelpers.net
     succeeded = function(tx) {
       txLocks[tx.db.dbname].inProgress = false;
       tx.db.startNextTransaction();
-      if (tx.error) {
+      if (tx.error && typeof tx.error === 'function') {
         tx.error(txFailure);
       }
     };
     failed = function(tx, err) {
       txLocks[tx.db.dbname].inProgress = false;
       tx.db.startNextTransaction();
-      if (tx.error) {
-        tx.error(newSQLError("error while trying to roll back: " + err.message, err.code));
+      if (tx.error && typeof tx.error === 'function') {
+        tx.error(newSQLError('error while trying to roll back: ' + err.message, err.code));
       }
     };
     this.finalized = true;
@@ -636,15 +644,15 @@ Contact for commercial license: info@litehelpers.net
     succeeded = function(tx) {
       txLocks[tx.db.dbname].inProgress = false;
       tx.db.startNextTransaction();
-      if (tx.success) {
+      if (tx.success && typeof tx.success === 'function') {
         tx.success();
       }
     };
     failed = function(tx, err) {
       txLocks[tx.db.dbname].inProgress = false;
       tx.db.startNextTransaction();
-      if (tx.error) {
-        tx.error(newSQLError("error while trying to commit: " + err.message, err.code));
+      if (tx.error && typeof tx.error === 'function') {
+        tx.error(newSQLError('error while trying to commit: ' + err.message, err.code));
       }
     };
     this.finalized = true;
@@ -695,7 +703,7 @@ Contact for commercial license: info@litehelpers.net
         throw newSQLError('Database name value is missing in openDatabase call');
       }
       if (!!openargs.location && !!openargs.iosDatabaseLocation) {
-        throw newSQLError('AMBIGUOUS: both location or iosDatabaseLocation values are present in openDatabase call');
+        throw newSQLError('AMBIGUOUS: both location and iosDatabaseLocation settings are present in openDatabase call. Please use either setting, not both.');
       }
       dblocation = !!openargs.location && openargs.location === 'default' ? iosLocationMap['default'] : !!openargs.iosDatabaseLocation ? iosLocationMap[openargs.iosDatabaseLocation] : !openargs.location && openargs.location !== 0 ? iosLocationMap['default'] : dblocations[openargs.location];
       if (!dblocation) {
@@ -741,7 +749,7 @@ Contact for commercial license: info@litehelpers.net
         args.path = dbname;
       }
       if (!!first.location && !!first.iosDatabaseLocation) {
-        throw newSQLError('AMBIGUOUS: both location or iosDatabaseLocation values are present in deleteDatabase call');
+        throw newSQLError('AMBIGUOUS: both location and iosDatabaseLocation settings are present in deleteDatabase call. Please use either setting value, not both.');
       }
       dblocation = !!first.location && first.location === 'default' ? iosLocationMap['default'] : !!first.iosDatabaseLocation ? iosLocationMap[first.iosDatabaseLocation] : !first.location && first.location !== 0 ? iosLocationMap['default'] : dblocations[first.location];
       if (!dblocation) {
@@ -762,20 +770,20 @@ Contact for commercial license: info@litehelpers.net
         name: SelfTest.DBNAME,
         location: 'default'
       }, (function() {
-        return SelfTest.start2(successcb, errorcb);
+        return SelfTest.step1(successcb, errorcb);
       }), (function() {
-        return SelfTest.start2(successcb, errorcb);
+        return SelfTest.step1(successcb, errorcb);
       }));
     },
-    start2: function(successcb, errorcb) {
+    step1: function(successcb, errorcb) {
       SQLiteFactory.openDatabase({
         name: SelfTest.DBNAME,
         location: 'default'
       }, function(db) {
         var check1;
         check1 = false;
-        return db.transaction(function(tx) {
-          return tx.executeSql('SELECT UPPER("Test") AS upperText', [], function(ignored, resutSet) {
+        db.transaction(function(tx) {
+          tx.executeSql('SELECT UPPER("Test") AS upperText', [], function(ignored, resutSet) {
             if (!resutSet.rows) {
               return SelfTest.finishWithError(errorcb, 'Missing resutSet.rows');
             }
@@ -789,27 +797,67 @@ Contact for commercial license: info@litehelpers.net
               return SelfTest.finishWithError(errorcb, 'Missing resutSet.rows.item(0).upperText');
             }
             if (resutSet.rows.item(0).upperText !== 'TEST') {
-              return SelfTest.finishWithError(errorcb, "Incorrect resutSet.rows.item(0).upperText value: " + (resutSet.rows.item(0).data) + " (expected: 'TEST')");
+              return SelfTest.finishWithError(errorcb, "Incorrect resutSet.rows.item(0).upperText value: " + (resutSet.rows.item(0).upperText) + " (expected: 'TEST')");
             }
             check1 = true;
-          }, function(sql_err) {
-            SelfTest.finishWithError(errorcb, "SQL error: " + sql_err);
+          }, function(ignored, tx_sql_err) {
+            return SelfTest.finishWithError(errorcb, "TX SQL error: " + tx_sql_err);
           });
         }, function(tx_err) {
-          SelfTest.finishWithError(errorcb, "TRANSACTION error: " + tx_err);
+          return SelfTest.finishWithError(errorcb, "TRANSACTION error: " + tx_err);
         }, function() {
           if (!check1) {
             return SelfTest.finishWithError(errorcb, 'Did not get expected upperText result data');
           }
-          delete db.openDBs[SelfTest.DBNAME];
-          delete txLocks[SelfTest.DBNAME];
-          SelfTest.start3(successcb, errorcb);
+          db.executeSql('BEGIN', null, function(ignored) {
+            return nextTick(function() {
+              delete db.openDBs[SelfTest.DBNAME];
+              delete txLocks[SelfTest.DBNAME];
+              nextTick(function() {
+                db.transaction(function(tx2) {
+                  tx2.executeSql('SELECT 1');
+                }, function(tx_err) {
+                  if (!tx_err) {
+                    return SelfTest.finishWithError(errorcb, 'Missing error object');
+                  }
+                  SelfTest.step2(successcb, errorcb);
+                }, function() {
+                  return SelfTest.finishWithError(errorcb, 'Missing error object');
+                });
+              });
+            });
+          });
         });
       }, function(open_err) {
         return SelfTest.finishWithError(errorcb, "Open database error: " + open_err);
       });
     },
-    start3: function(successcb, errorcb) {
+    step2: function(successcb, errorcb) {
+      SQLiteFactory.openDatabase({
+        name: SelfTest.DBNAME,
+        location: 'default'
+      }, function(db) {
+        db.transaction(function(tx) {
+          tx.executeSql('SELECT ? AS myResult', [null], function(ignored, resutSet) {
+            if (!resutSet.rows) {
+              return SelfTest.finishWithError(errorcb, 'Missing resutSet.rows');
+            }
+            if (!resutSet.rows.length) {
+              return SelfTest.finishWithError(errorcb, 'Missing resutSet.rows.length');
+            }
+            if (resutSet.rows.length !== 1) {
+              return SelfTest.finishWithError(errorcb, "Incorrect resutSet.rows.length value: " + resutSet.rows.length + " (expected: 1)");
+            }
+            SelfTest.step3(successcb, errorcb);
+          });
+        }, function(txError) {
+          return SelfTest.finishWithError(errorcb, "UNEXPECTED TRANSACTION ERROR: " + txError);
+        });
+      }, function(open_err) {
+        return SelfTest.finishWithError(errorcb, "Open database error: " + open_err);
+      });
+    },
+    step3: function(successcb, errorcb) {
       SQLiteFactory.openDatabase({
         name: SelfTest.DBNAME,
         location: 'default'
@@ -922,15 +970,10 @@ Contact for commercial license: info@litehelpers.net
                       SelfTest.finishWithError(errorcb, 'second readTransaction did not finish');
                       return;
                     }
-                    return db.close(function() {
-                      return SQLiteFactory.deleteDatabase({
-                        name: SelfTest.DBNAME,
-                        location: 'default'
-                      }, successcb, function(cleanup_err) {
-                        return SelfTest.finishWithError(errorcb, "Cleanup error: " + cleanup_err);
-                      });
+                    db.close(function() {
+                      SelfTest.cleanupAndFinish(successcb, errorcb);
                     }, function(close_err) {
-                      return SelfTest.finishWithError(errorcb, "close error: " + close_err);
+                      SelfTest.finishWithError(errorcb, "close error: " + close_err);
                     });
                   });
                 });
@@ -946,14 +989,24 @@ Contact for commercial license: info@litehelpers.net
         return SelfTest.finishWithError(errorcb, "Open database error: " + open_err);
       });
     },
+    cleanupAndFinish: function(successcb, errorcb) {
+      SQLiteFactory.deleteDatabase({
+        name: SelfTest.DBNAME,
+        location: 'default'
+      }, successcb, function(cleanup_err) {
+        SelfTest.finishWithError(errorcb, "CLEANUP DELETE ERROR: " + cleanup_err);
+      });
+    },
     finishWithError: function(errorcb, message) {
+      console.log("selfTest ERROR with message: " + message);
       SQLiteFactory.deleteDatabase({
         name: SelfTest.DBNAME,
         location: 'default'
       }, function() {
-        return errorcb(newSQLError(message));
+        errorcb(newSQLError(message));
       }, function(err2) {
-        return errorcb(newSQLError("Cleanup error: " + err2 + " for error: " + message));
+        console.log("selfTest CLEANUP DELETE ERROR " + err2);
+        errorcb(newSQLError("CLEANUP DELETE ERROR: " + err2 + " for error: " + message));
       });
     }
   };
@@ -974,7 +1027,7 @@ Contact for commercial license: info@litehelpers.net
       error = function(e) {
         return errorcb(e);
       };
-      return cordova.exec(okcb, errorcb, "SQLitePlugin", "echoStringValue", [
+      return cordova.exec(ok, error, "SQLitePlugin", "echoStringValue", [
         {
           value: 'test-string'
         }
