@@ -1,5 +1,9 @@
 # Changes
 
+## cordova-sqlite-evplus-ext-free 0.0.3
+
+- cordova-sqlite-evplus-ext-free with SQLITE_THREADSAFE=1 on iOS/macOS ref: litehelpers/Cordova-sqlite-storage#754 (<https://github.com/litehelpers/Cordova-sqlite-storage/issues/754>)
+
 ## cordova-sqlite-evplus-ext-free 0.0.2
 
 ### cordova-sqlite-evcore-legacy-ext-common-free 0.0.1

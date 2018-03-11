@@ -131,7 +131,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation.
 - Use of other systems such as Cordova Plugman, PhoneGap CLI, PhoneGap Build, and Intel XDK is no longer supported by this plugin version since they do not honor the `before_plugin_install` hook. The supported solution is to use [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free) (GPL or commercial license terms); alternative with permissive license terms is available at: [brodybits / cordova-sqlite-legacy-build-support](https://github.com/brodybits/cordova-sqlite-legacy-build-support) (limited testing, limited updates).
 - The iOS database location is now mandatory, as documented below.
 - SQLite version `3.15.2` included with the following compile-time options:
-  - `SQLITE_THREADSAFE=2` (all platforms in this plugin version)
+  - `SQLITE_THREADSAFE=1` for iOS/macOS (`SQLITE_THREADSAFE=2` for Android/Windows)
   - ~~`SQLITE_DEFAULT_MEMSTATUS=0`~~ _(FUTURE TODO)_
   - ~~`SQLITE_OMIT_DECLTYPE`~~ _(FUTURE TODO)_
   - ~~`SQLITE_OMIT_DEPRECATED`~~ _(FUTURE TODO)_
