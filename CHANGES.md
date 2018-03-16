@@ -1,5 +1,25 @@
 # Changes
 
+## cordova-sqlite-evplus-ext-free 0.0.4
+
+### cordova-sqlite-evcore-legacy-ext-common-free 0.0.4
+
+- additional evcore iOS/macOS/Windows compile-time options
+
+#### cordova-sqlite-ext-common 0.1.0
+
+- BASE64 support
+- REGEXP for Android/iOS/macOS using sqlite3-regexp-cached
+
+### cordova-sqlite-evcore-legacy-ext-common-free 0.0.3
+
+- cordova-sqlite-evcore-legacy-ext-common-free with SQLITE_THREADSAFE=1 on iOS/macOS ref: litehelpers/Cordova-sqlite-storage#754 (<https://github.com/litehelpers/Cordova-sqlite-storage/issues/754>)
+
+### cordova-sqlite-evcore-legacy-ext-common-free 0.0.2
+
+- Android evcore NDK JAR from cordova-sqlite-evcore-free-dependencies, no longer built with JSMN component (with REGEXP and BASE64 support included for Android)
+- Remove SQLITE_ENABLE_COLUMN_METADATA not needed (iOS/macOS/Windows)
+
 ## cordova-sqlite-evplus-ext-free 0.0.3
 
 - cordova-sqlite-evplus-ext-free with SQLITE_THREADSAFE=1 on iOS/macOS ref: litehelpers/Cordova-sqlite-storage#754 (<https://github.com/litehelpers/Cordova-sqlite-storage/issues/754>)
