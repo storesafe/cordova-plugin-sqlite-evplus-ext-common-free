@@ -4,7 +4,7 @@ Native interface to sqlite in a Cordova/PhoneGap plugin for Android, iOS, macOS,
 
 This plugin version uses a special Android NDK sqlite database access library (C-language implementation) to provide significant performance and memory usage improvements on the Android platform.
 
-This plugin version is available under GPL v3 (http://www.gnu.org/licenses/gpl.txt) or commercial license options and includes components available under the MIT and Apache 2.0 licenses listed in [LICENSE.md](./LICENSE.md). Contact for commercial license: <sales@litehelpers.net>
+This plugin version is available under GPL v3 (<https://www.gnu.org/licenses/gpl-3.0.txt>) or commercial license options and includes components available under the MIT and Apache 2.0 licenses listed in [LICENSE.md](./LICENSE.md). Contact for commercial license: <sales@litehelpers.net>
 
 **NOTICE:** Commercial licenses for _Cordova-sqlite-evcore and_ [litehelpers / Cordova-sqlite-enterprise-free](https://github.com/litehelpers/Cordova-sqlite-enterprise-free) are **NOT** valid for this version. For an upgrade please contact <sales@litehelpers.net>.
 
@@ -22,7 +22,7 @@ TBD NOTE: This version branch has external sqlite3 dependencies that are install
 
 ## WARNING: Multiple SQLite problem on Android
 
-This plugin uses a non-standard [litehelpers / Android-sqlite-evcore-native-driver-free](https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free) sqlite database access implementation on Android. In case an application access the SAME database using multiple plugins there is a risk of data corruption (ref: [litehelpers/Cordova-sqlite-storage#626](https://github.com/litehelpers/Cordova-sqlite-storage/issues/626)) as described in <http://ericsink.com/entries/multiple_sqlite_problem.html> and <https://www.sqlite.org/howtocorrupt.html>.
+This plugin uses non-standard [litehelpers / Android-sqlite-evcore-native-driver-free](https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free) sqlite database access implementation on Android. In case an application access the SAME database using multiple plugins there is a risk of data corruption (ref: [litehelpers/Cordova-sqlite-storage#626](https://github.com/litehelpers/Cordova-sqlite-storage/issues/626)) as described in <http://ericsink.com/entries/multiple_sqlite_problem.html> and <https://www.sqlite.org/howtocorrupt.html>.
 
 The workaround is to use the `androidDatabaseImplementation: 2` setting as described in the **Android sqlite implementation** section below:
 
@@ -132,16 +132,17 @@ See the [Sample section](#sample) for a sample with a more detailed explanation.
   - BASE64 integrated from [brodybits / sqlite3-base64](https://github.com/brodybits/sqlite3-base64), using [brodybits / libb64-encode](https://github.com/brodybits/libb64-encode) (based on <http://libb64.sourceforge.net/> by Chris Venter, public domain)
   -  REGEXP for Android _(default [Android-sqlite-evcore-native-driver-free](https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free) database access implementation)_, iOS, and macOS using [brodybits / sqlite3-regexp-cached](https://github.com/brodybits/sqlite3-regexp-cached) (based on <http://git.altlinux.org/people/at/packages/?p=sqlite3-pcre.git> by Alexey Tourbin, public domain)
 - The iOS database location is now mandatory, as documented below.
-- SQLite version `3.15.2` included with the following compile-time options:
-  - `SQLITE_THREADSAFE=1` on iOS/macOS/Windows (`SQLITE_THREADSAFE=2` Android)
+- SQLite version `3.22.0` included with the following compile-time options:
+  - `SQLITE_THREADSAFE=1`
+  - `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE build setting) ref: [litehelpers/Cordova-sqlite-storage#736](https://github.com/litehelpers/Cordova-sqlite-storage/issues/736)
   - `SQLITE_LOCKING_STYLE=1` on iOS/macOS ONLY
   - `HAVE_USLEEP=1` (iOS/macOS/Windows)
+  - `SQLITE_DEFAULT_MEMSTATUS=0`
+  - `SQLITE_OMIT_DECLTYPE`
+  - `SQLITE_OMIT_DEPRECATED`
+  - `SQLITE_OMIT_SHARED_CACHE`
+  - `SQLITE_OMIT_LOAD_EXTENSION`
   - `SQLITE_TEMP_STORE=2`
-  - `SQLITE_DEFAULT_MEMSTATUS=0` (iOS/macOS/Windows)
-  - `SQLITE_OMIT_DECLTYPE` (iOS/macOS/Windows)
-  - `SQLITE_OMIT_DEPRECATED` (iOS/macOS/Windows)
-  - `SQLITE_OMIT_SHARED_CACHE` (iOS/macOS/Windows)
-  - `SQLITE_OMIT_LOAD_EXTENSION` (iOS/macOS/Windows)
   - `SQLITE_ENABLE_FTS3`
   - `SQLITE_ENABLE_FTS3_PARENTHESIS`
   - `SQLITE_ENABLE_FTS4`
@@ -177,6 +178,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation.
 
 ## Announcements
 
+- Using recent version of SQLite3 (`3.22.0`) with `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE) build setting to be extra robust against possible database corruption ref: [litehelpers/Cordova-sqlite-storage#736](https://github.com/litehelpers/Cordova-sqlite-storage/issues/736)
 - Nice overview of alternatives for storing local data in Cordova apps at: <https://www.sitepoint.com/storing-local-data-in-a-cordova-app/>
 - New alternative solution for small data storage: [TheCocoaProject/ cordova-plugin-nativestorage](https://github.com/TheCocoaProject/cordova-plugin-nativestorage) - simpler "native storage of variables" for Android/iOS/Windows
 - Resolved Java 6/7/8 concurrent map compatibility issue reported in [litehelpers/Cordova-sqlite-storage#726](https://github.com/litehelpers/Cordova-sqlite-storage/issues/726), THANKS to pointer by [@NeoLSN (Jason Yang/楊朝傑)](https://github.com/NeoLSN) in [litehelpers/Cordova-sqlite-storage#727](https://github.com/litehelpers/Cordova-sqlite-storage/issues/727).
@@ -185,7 +187,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation.
 - Fixed iOS/macOS platform version to use [PSPDFThreadSafeMutableDictionary.m](https://gist.github.com/steipete/5928916) to avoid threading issue ref: [litehelpers/Cordova-sqlite-storage#716](https://github.com/litehelpers/Cordova-sqlite-storage/issues/716)
 - [brodybits / cordova-sqlite-test-app](https://github.com/brodybits/cordova-sqlite-test-app) project is a CC0 (public domain) starting point (NOTE that this plugin must be added) and may also be used to reproduce issues with this plugin.
 - The Lawnchair adapter is now moved to [litehelpers / cordova-sqlite-lawnchair-adapter](https://github.com/litehelpers/cordova-sqlite-lawnchair-adapter).
-- [litehelpers / cordova-sqlite-ext](https://github.com/litehelpers/cordova-sqlite-ext) now supports SELECT BLOB data in Base64 format on all platforms in addition to REGEXP (Android/iOS/macOS) and pre-populated database (all platforms).
+- This plugin version now supports SELECT BLOB data in Base64 format on all platforms in addition to REGEXP (Android/iOS/macOS) ~~and pre-populated database (all platforms - FUTURE TODO)~~.
 - [brodybits / sql-promise-helper](https://github.com/brodybits/sql-promise-helper) provides a Promise-based API wrapper.
 - [nolanlawson / pouchdb-adapter-cordova-sqlite](https://github.com/nolanlawson/pouchdb-adapter-cordova-sqlite) supports this plugin along with other implementations such as [nolanlawson / sqlite-plugin-2](https://github.com/nolanlawson/sqlite-plugin-2) and [Microsoft / cordova-plugin-websql](https://github.com/Microsoft/cordova-plugin-websql).
 - macOS ("osx" platform) is now supported
@@ -350,7 +352,7 @@ In case you get stuck with something please read through the [support](#support)
 
 ### Plugin usage examples
 
-- [brodybits / cordova-sqlite-storage-starter-app](https://github.com/brodybits/cordova-sqlite-storage-starter-app) (uses `cordova-sqlite-storage` plugin version)
+- [brodybits / cordova-sqlite-storage-starter-app](https://github.com/brodybits/cordova-sqlite-storage-starter-app) (using `cordova-sqlite-storage` plugin version)
 - <http://stackoverflow.com/questions/26604952/a-simple-cordova-android-example-including-sqlite-read-write-and-search>
 
 ### Plugin tutorials
