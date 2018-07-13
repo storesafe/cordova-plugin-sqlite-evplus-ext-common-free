@@ -333,27 +333,21 @@
       if !sqlStatements || sqlStatements.constructor isnt Array
         throw newSQLError 'sqlBatch expects an array'
 
-      batchList = []
+      ss = sqlStatements.slice(0)
 
-      for st in sqlStatements
-        if st.constructor is Array
-          if st.length == 0
-            throw newSQLError 'sqlBatch array element of zero (0) length'
+      f = (tx) ->
+        for s in ss
+          if s.constructor is Array
+            if s.length is 0
+              throw newSQLError 'sqlBatch array element of zero (0) length'
 
-          batchList.push
-            sql: st[0]
-            params: if st.length == 0 then [] else st[1]
+            tx.addStatement s[0],
+              (if s.length is 0 then [] else s[1]), null, null
 
-        else
-          batchList.push
-            sql: st
-            params: []
+          else
+            tx.addStatement s, [], null, null
 
-      myfn = (tx) ->
-        for elem in batchList
-          tx.addStatement(elem.sql, elem.params, null, null)
-
-      @addTransaction new SQLitePluginTransaction(this, myfn, error, success, true, false)
+      @addTransaction new SQLitePluginTransaction(this, f, error, success, true, false)
       return
 
 ## SQLite plugin transaction object for batching:
@@ -375,7 +369,10 @@
       @success = success
       @txlock = txlock
       @readOnly = readOnly
-      @executes = []
+
+      @executesLength = 0
+      @flatExecutesList = []
+      @executeCallbacks = []
 
       if txlock
         @addStatement "BEGIN", [], null, (tx, err) ->
@@ -426,22 +423,27 @@
       else
         sql.toString()
 
-      params = []
+      @executesLength++
+
+      flatlist = @flatExecutesList
+      flatlist.push sqlStatement
+
       if !!values && values.constructor == Array
+        flatlist.push values.length
         for v in values
           t = typeof v
-          params.push (
+          flatlist.push(
             if v == null || v == undefined then null
             else if t == 'number' || t == 'string' then v
             else v.toString()
           )
 
-      @executes.push
+      else
+        flatlist.push 0
+
+      @executeCallbacks.push
         success: success
         error: error
-
-        sql: sqlStatement
-        params: params
 
       return
 
@@ -474,34 +476,45 @@
     SQLitePluginTransaction::run = ->
       # persist for handlerFor callbacks:
       txFailure = null
-      # sql statements from queue:
-      batchExecutes = @executes
 
-      # NOTE: If this is zero it will not work. Workaround is applied in the constructor.
+      # sql statements from queue:
+      batchExecutesLength = @executesLength
+      flatBatchExecutes = @flatExecutesList
+      batchExecuteCallbacks = @executeCallbacks
+
+      # XXX NOTE: If this length is zero it will not work.
+      # Workaround is applied in the constructor.
       # FUTURE TBD: It would be better to fix the problem here.
-      waiting = batchExecutes.length
-      @executes = []
+
+      waiting = batchExecutesLength
+      @executesLength = 0
+      @flatExecutesList = []
+      @executeCallbacks = []
 
       # my tx object (this)
       tx = @
 
+      # FUTURE TBD factor this out in favor of a more elegant solution?
       handlerFor = (index, didSucceed) ->
         (response) ->
           if !txFailure
             try
               if didSucceed
-                tx.handleStatementSuccess batchExecutes[index].success, response
+                tx.handleStatementSuccess batchExecuteCallbacks[index].success, response
               else
-                tx.handleStatementFailure batchExecutes[index].error, newSQLError(response)
+                tx.handleStatementFailure batchExecuteCallbacks[index].error, newSQLError(response)
             catch err
               # NOTE: txFailure is expected to be null at this point.
               txFailure = newSQLError(err)
 
           if --waiting == 0
             if txFailure
-              tx.executes = []
+              tx.executesLength = 0
+              tx.flatExecutesList = []
+              tx.executeCallbacks = []
+
               tx.$abort txFailure
-            else if tx.executes.length > 0
+            else if tx.executesLength > 0
               # new requests have been issued by the callback
               # handlers, so run another batch.
               tx.run()
@@ -511,42 +524,28 @@
           return
 
       if @db.fjmap[@db.dbname]
-        @run_batch_flatjson batchExecutes, handlerFor
+        @run_batch_flatjson batchExecutesLength, flatBatchExecutes, handlerFor
       else
-        @run_batch batchExecutes, handlerFor
+        @run_batch1 batchExecutesLength, flatBatchExecutes, handlerFor
+
       return
 
-    # version for Android-sqlite-evcore-native-driver-free (with flat JSON interface)
-    SQLitePluginTransaction::run_batch_flatjson = (batchExecutes, handlerFor) ->
+    # version with flat JSON interface
+    SQLitePluginTransaction::run_batch_flatjson = (batchExecutesLength, flatBatchExecutes, handlerFor) ->
       flatlist = []
-      mycbmap = {}
 
-      # XXX not always set in SQLitePlugin::open
-      # FUTURE TBD find a more efficient way?
+      # XXX TBD evidently not always set in SQLitePlugin::open
+      # FUTURE TBD more elegant solution that may possibly be more efficient
       @db.dbid = @db.dbidmap[@db.dbname]
 
       flatlist.push @db.dbid
-      flatlist.push batchExecutes.length
+      flatlist.push batchExecutesLength
 
-      i = 0
-      while i < batchExecutes.length
-        request = batchExecutes[i]
-
-        mycbmap[i] =
-          success: handlerFor(i, true)
-          error: handlerFor(i, false)
-
-        flatlist.push request.sql
-        flatlist.push request.params.length
-        for p in request.params
-          flatlist.push p
-
-        i++
+      # THANKS for GUIDANCE:
+      # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push#Merging_two_arrays
+      Array.prototype.push.apply(flatlist, flatBatchExecutes)
 
       flatlist.push 'extra'
-
-      # keep for batch error handling:
-      bl = batchExecutes.length
 
       mycb = (result) ->
         i = 0
@@ -554,9 +553,9 @@
         rl = result.length
 
         if rl > 0 and result[0] is 'batcherror'
-          while i < bl
-            # TODO use correct code values
-            mycbmap[i].error
+          while i < batchExecutesLength
+            # XXX TODO use correct error code values
+            handlerFor(i, false)
               result:
                 code: -1
                 sqliteCode: -1
@@ -567,17 +566,18 @@
 
         while ri < rl
           r = result[ri++]
-          q = mycbmap[i]
 
           if r == 'ok'
-            q.success { rows: [] }
+            handlerFor(i, true)({ rows: [] })
 
           else if r is "ch2"
             changes = result[ri++]
             insert_id = result[ri++]
-            q.success
+
+            handlerFor(i, true)({
               rowsAffected: changes
               insertId: insert_id
+            })
 
           else if r == 'okrows'
             rows = []
@@ -605,16 +605,23 @@
 
               rows.push row
 
-            q.success { rows: rows, rowsAffected: changes, insertId: insert_id }
+            handlerFor(i, true)({
+              rows: rows
+              rowsAffected: changes
+              insertId: insert_id
+            })
+
             ++ri
 
           else if r == 'error'
             code = result[ri++]
             ++ri # [ignored]
             errormessage = result[ri++]
-            q.error
+
+            handlerFor(i, false)({
               code: code
               message: errormessage
+            })
 
           ++i
 
@@ -625,23 +632,27 @@
 
       return
 
-    # version for other platforms
-    SQLitePluginTransaction::run_batch = (batchExecutes, handlerFor) ->
+    # version for platforms with no flat JSON interface:
+    SQLitePluginTransaction::run_batch1 = (batchExecutesLength, flatBatchExecutes, handlerFor) ->
       tropts = []
       mycbmap = {}
 
+      fi = 0
       i = 0
-      while i < batchExecutes.length
-        request = batchExecutes[i]
+      while i < batchExecutesLength
+        sql = flatBatchExecutes[fi++]
+        paramsCount = flatBatchExecutes[fi++]
+        fi2 = fi+paramsCount
+        params = flatBatchExecutes.slice(fi, fi2)
+        fi = fi2
 
         mycbmap[i] =
           success: handlerFor(i, true)
           error: handlerFor(i, false)
 
         tropts.push
-          qid: null # TBD NEEDED to pass @brodybits/Cordova-sql-test-app for some reason
-          sql: request.sql
-          params: request.params
+          sql: sql
+          params: params
 
         i++
 

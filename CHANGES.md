@@ -1,5 +1,9 @@
 # Changes
 
+## cordova-plugin-sqlite-evplus-ext-common-free 0.1.1
+
+- additional performance enhancements for evplus to reduce the amount of looping in the JavaScript
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.1.0
 
 ### cordova-sqlite-evcore-common-free 0.0.1

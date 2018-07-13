@@ -34,7 +34,7 @@ New release in July 2018 will include the following major enhancements ([litehel
 
 ## About this plugin version
 
-_Premium enterprise version with performance improvements for Android - common version branch with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm_.
+_Premium enterprise version with additional performance improvements for Android - common version branch with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm_.
 
 __XXX TODO evplus feature MISSING in this plugin version: iOS performance enhancements ref: [litehelpers/cordova-plugin-sqlite-evplus-ext-common-free#2](https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free/issues/2)__
 
@@ -254,6 +254,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
 
 ## Announcements
 
+- This plugin version includes additional JavaScript performance enhancements with special benefit for Android.
 - Using recent version of SQLite3 (`3.22.0`) with `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE) build setting to be extra robust against possible database corruption ref: [litehelpers/Cordova-sqlite-storage#736](https://github.com/litehelpers/Cordova-sqlite-storage/issues/736)
 - Nice overview of alternatives for storing local data in Cordova apps at: <https://www.sitepoint.com/storing-local-data-in-a-cordova-app/>
 - New alternative solution for small data storage: [TheCocoaProject/ cordova-plugin-nativestorage](https://github.com/TheCocoaProject/cordova-plugin-nativestorage) - simpler "native storage of variables" for Android/iOS/Windows
