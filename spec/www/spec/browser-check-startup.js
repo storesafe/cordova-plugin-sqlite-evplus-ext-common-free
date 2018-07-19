@@ -13,7 +13,7 @@ var isIE = isWindows || isWP8;
 var isWebKit = !isIE; // TBD [Android or iOS]
 
 window.hasBrowser = true;
-window.hasWebKitBrowser = isWebKit;
+window.hasWebKitBrowser = (isWebKit && !(/Macintosh/.test(navigator.userAgent)));
 
 describe('check startup', function() {
   it('receives deviceready event', function(done) {

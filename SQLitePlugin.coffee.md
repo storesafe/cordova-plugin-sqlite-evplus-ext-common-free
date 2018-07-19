@@ -32,7 +32,7 @@
     # XXX TBD this will be renamed and include some more per-db state.
     txLocks = {}
 
-    # Indicate if the platform implementation (Android) requires flat JSON interface
+    # Indicate if the platform implementation (Android/iOS/macOS) requires flat JSON interface
     useflatjson = false
 
 ## utility functions:
@@ -220,10 +220,9 @@
           # NOTE: the db state is NOT stored (in @openDBs) if the db was closed or deleted.
           console.log 'OPEN database: ' + @dbname + ' OK'
 
-          # Needed to distinguish between Android version (with flat JSON batch sql interface) and
-          # other versions (JSON batch interface unchanged)
+          # distinguish use of flat JSON batch sql interface
           if !!a1 and a1 == 'a1'
-            console.log 'Detected Android/iOS version with flat JSON interface'
+            console.log 'Detected Android/iOS/macOS platform version with flat JSON interface'
             useflatjson = true
 
           #if !@openDBs[@dbname] then call open error cb, and abort pending tx if any
@@ -438,7 +437,7 @@
         @run_batch batchExecutes, handlerFor
       return
 
-    # version for Android (with flat JSON interface)
+    # version for Android/iOS/macOS with flat JSON interface
     SQLitePluginTransaction::run_batch_flatjson = (batchExecutes, handlerFor) ->
       flatlist = []
       mycbmap = {}
@@ -693,4 +692,3 @@
 
 #### vim: set filetype=coffee :
 #### vim: set expandtab :
-

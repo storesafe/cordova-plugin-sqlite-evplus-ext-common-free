@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="cordova-sqlite-evcommon"
-    version="0.7.0-dev">
+    id="cordova-sqlite-evplus-legacy-common-exp-core"
+    version="0.0.1">
 
-    <name>Cordova sqlite storage enterprise (common source) with Android memory fix</name>
+    <name>Cordova sqlite storage evplus legacy common core version with internal memory enhancements (not for production)</name>
 
-    <license>GPL</license>
+    <license>GPL-3.0 OR Commercial</license>
 
     <keywords>sqlite</keywords>
 
     <description>Native interface to SQLite for PhoneGap/Cordova. Allows you to use more storage and provides more flexibility than the standard Web SQL database (window.openDatabase).</description>
-    <author>Litehelpers (various)</author>
-
-    <engines>
-        <engine name="cordova" version=">=3.3.0" />
-    </engines>
+    <author>Litehelpers/various</author>
 
     <js-module src="www/SQLitePlugin.js" name="SQLitePlugin">
         <clobbers target="SQLitePlugin" />
@@ -53,8 +49,22 @@
 
     </platform>
 
+    <platform name="osx">
+        <config-file target="config.xml" parent="/*">
+            <feature name="SQLitePlugin">
+                <param name="ios-package" value="SQLitePlugin" />
+            </feature>
+        </config-file>
+
+        <!-- Note: the ios src is based off src/ios implicitly -->
+        <header-file src="src/ios/SQLitePlugin.h" />
+        <source-file src="src/ios/SQLitePlugin.m" />
+        <framework src="libsqlite3.dylib" />
+
+    </platform>
+
     <!-- windows -->
-    <platform name="windows">
+    <platform name="windows-disabled-not-supported">
         <js-module src="src/windows/SQLiteProxy.js" name="SQLiteProxy">
             <merges target="" />
         </js-module>

@@ -719,7 +719,7 @@ var mytests = function() {
                   // NOTE: storing big integer in TEXT field WORKING OK with WP(8) version.
                   // It is now suspected that the issue lies with the results handling.
                   // XXX Brody TODO: storing big number in TEXT field is different for Plugin vs. Web SQL!
-                  if (isWebSql)
+                  if (isWebSql || (/Macintosh/.test(navigator.userAgent)))
                     strictEqual(row.test_text, "1424174959894.0", "[Big] number inserted as string ok");
                   else
                     strictEqual(row.test_text, "1424174959894", "Big integer number inserted as string ok");

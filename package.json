@@ -1,36 +1,30 @@
 {
-  "name": "cordova-sqlite-evcommon",
-  "version": "0.7.0-dev",
-  "description": "Native interface to SQLite for PhoneGap/Cordova enterprise (common version-limited functionality) with Android memory fix",
+  "name": "cordova-sqlite-evplus-legacy-common-exp-core",
+  "version": "0.0.1",
+  "description": "Native interface to SQLite for PhoneGap/Cordova - evplus legacy common core version (limited functionality) with internal memory enhancements (not for production)",
   "cordova": {
-    "id": "cordova-sqlite-evcommon",
+    "id": "cordova-sqlite-evplus-legacy-common-exp-core",
     "platforms": [
       "android",
       "ios",
-      "windows",
+      "xx"
     ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/litehelpers/cordova-sqlite-common.git"
+    "url": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free.git"
   },
   "keywords": [
     "sqlite",
     "ecosystem:cordova",
     "cordova-android",
     "cordova-ios",
-    "cordova-windows",
-  ],
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=3.3.0"
-    }
+    "xx"
   ],
   "author": "various",
-  "license": "GPL",
+  "license": "GPL-3.0 OR Commercial",
   "bugs": {
-    "url": "https://github.com/litehelpers/cordova-sqlite-common/issues"
+    "url": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free/issues"
   },
-  "homepage": "https://github.com/litehelpers/cordova-sqlite-common"
+  "homepage": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free"
 }

@@ -96,8 +96,10 @@
         NSValue *dbPointer = [openDBs objectForKey:dbfilename];
 
         if (dbPointer != NULL) {
-            NSLog(@"Reusing existing database connection for db name %@", dbfilename);
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Database opened"];
+            // XXX NO REUSE DUE TO litehelpers/Cordova-sqlite-storage#666
+            // FUTURE TODO signal error status in production version branch
+            // NSLog(@"Reusing existing database connection for db name %@", dbfilename);
+            // pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Database opened"];
         } else {
             const char *name = [dbname UTF8String];
             sqlite3 *db;
