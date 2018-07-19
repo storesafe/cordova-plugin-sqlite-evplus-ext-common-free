@@ -628,7 +628,8 @@
         return
 
       # NOTE: flatlist.length is needed internally for the JSON decoding.
-      cordova.exec mycb, null, "SQLitePlugin", "fj:#{flatlist.length};extra", flatlist
+      if @db.dbid isnt -1
+        cordova.exec mycb, null, "SQLitePlugin", "fj:#{flatlist.length};extra", flatlist
 
       return
 
