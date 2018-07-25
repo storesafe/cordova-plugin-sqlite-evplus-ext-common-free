@@ -1,6 +1,6 @@
 # Changes
 
-## cordova-plugin-sqlite-evplus-ext-common-free 0.1.2-dev+01
+## cordova-plugin-sqlite-evplus-ext-common-free 0.1.2-dev+02
 
 TBD
 

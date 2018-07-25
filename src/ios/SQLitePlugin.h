@@ -38,13 +38,16 @@ typedef int WebSQLError;
 -(void) close: (CDVInvokedUrlCommand*)command;
 -(void) delete: (CDVInvokedUrlCommand*)command;
 
--(void) openNow: (CDVInvokedUrlCommand*)command;
--(void) closeNow: (CDVInvokedUrlCommand*)command;
--(void) deleteNow: (CDVInvokedUrlCommand*)command;
+// Internal functions not needed:
+// -(void) openNow: (CDVInvokedUrlCommand*)command;
+// -(void) closeNow: (CDVInvokedUrlCommand*)command;
+// -(void) deleteNow: (CDVInvokedUrlCommand*)command;
 
 // Batch processing interface
 -(void) backgroundExecuteSqlBatch: (CDVInvokedUrlCommand*)command;
 
--(void) executeSqlBatchNow: (CDVInvokedUrlCommand*)command;
+// More internal functions not needed:
+// -(void) executeSqlBatchNow: (CDVInvokedUrlCommand*)command;
+// +(NSDictionary *)captureSQLiteErrorFromDb:(struct sqlite3 *)db
 
 @end /* vim: set expandtab : */

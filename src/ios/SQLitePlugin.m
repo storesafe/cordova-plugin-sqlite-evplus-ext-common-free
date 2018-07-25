@@ -368,7 +368,9 @@
         keepGoing = NO;
     } else if (params != NULL) {
         for (int b = 0; b < params.count; b++) {
-            result = [self bindStatement:statement withArg:[params objectAtIndex:b] atIndex:(b+1)];
+          // FUTURE TBD fix indentation:
+          result =
+            [self bindStatement:statement withArg:[params objectAtIndex:b] atIndex:(b+1)];
             if (result != SQLITE_OK) {
                 error = [SQLitePlugin captureSQLiteErrorFromDb:db];
                 keepGoing = NO;
