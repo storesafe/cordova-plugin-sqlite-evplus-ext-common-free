@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Chris Brody
+ * Copyright (C) 2012-2018 Christopher J. Brody
  * Copyright (C) 2011 Davide Bertola
  *
  * License for this version: GPL v3 (http://www.gnu.org/licenses/gpl.txt) or commercial license.
@@ -37,10 +37,10 @@ typedef int WebSQLError;
 
 // Batch processing interface
 -(void) backgroundExecuteSqlBatch: (CDVInvokedUrlCommand*)command;
--(void) executeSqlBatch: (CDVInvokedUrlCommand*)command;
+// -(void) executeSqlBatch: (CDVInvokedUrlCommand*)command;
 
--(id) getDBPath:(NSString *)dbFile at:(NSString *)atkey;
+// -(id) getDBPath:(NSString *)dbFile at:(NSString *)atkey;
 
-+(NSDictionary *)captureSQLiteErrorFromDb:(struct sqlite3 *)db;
+// +(NSDictionary *)captureSQLiteErrorFromDb:(struct sqlite3 *)db;
 
 @end /* vim: set expandtab : */
