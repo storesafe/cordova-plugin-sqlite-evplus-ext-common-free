@@ -391,7 +391,7 @@ var mytests = function() {
                         if (isWebSql)
                           expect(res.insertId > 0).toBe(true); // previous insertId value for (WebKit) Web SQL [known deviation]
                         if (!isWebSql && !isWindows && !isAndroid)
-                          expect(res.insertId).toBe(1); // XXX previous insertId on iOS/macOS plugin (INCONSISTENT with newer plugin versions)
+                          expect(res.insertId).not.toBeDefined(); // NOW CONSISTENT with newer plugin versions
 
                         start();
                       }, function(tx, err) {
@@ -1254,14 +1254,14 @@ var mytests = function() {
             }, function(tx, error) {
               ok(!!error, "valid error object");
 
-              // XXX ALSO BROKEN for iOS in this version:
-              //if (isWebSql || !(isAndroid || isWindows || isWP8))
-              //  ok(!!error['code'], "valid error.code exists");
+              // XXX CHECK for iOS/macOS in this plugin version branch:
+              if (isWebSql || !(isAndroid || isWindows || isWP8))
+                ok(!!error['code'], "valid error.code exists");
 
               ok(error.hasOwnProperty('message'), "error.message exists");
-              // XXX ALSO BROKEN for iOS in this version:
-              //if (isWebSql || !(isAndroid || isWindows || isWP8))
-              //  strictEqual(error.code, 5, "error.code === SQLException.SYNTAX_ERR (5)");
+              // XXX CHECK for iOS/macOS in this plugin version branch:
+              if (isWebSql || !(isAndroid || isWindows || isWP8))
+                strictEqual(error.code, 5, "error.code === SQLException.SYNTAX_ERR (5)");
               //equal(error.message, "Request failed: insert into test_table (data) VALUES ,123", "error.message");
               start();
 
@@ -1300,9 +1300,9 @@ var mytests = function() {
             }, function(tx, error) {
               ok(!!error, "valid error object");
 
-              // XXX ALSO BROKEN for iOS in this version:
-              //if (isWebSql || !(isAndroid || isWindows || isWP8))
-              //  ok(!!error['code'], "valid error.code exists");
+              // XXX CHECK for iOS/macOS in this plugin version branch:
+              if (isWebSql || !(isAndroid || isWindows || isWP8))
+                ok(!!error['code'], "valid error.code exists");
 
               ok(error.hasOwnProperty('message'), "error.message exists");
               //strictEqual(error.code, 6, "error.code === SQLException.CONSTRAINT_ERR (6)");

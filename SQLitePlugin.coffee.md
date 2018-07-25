@@ -216,12 +216,12 @@
       else
         console.log 'OPEN database: ' + @dbname
 
-        opensuccesscb = (a1) =>
+        opensuccesscb = (fjinfo) =>
           # NOTE: the db state is NOT stored (in @openDBs) if the db was closed or deleted.
           console.log 'OPEN database: ' + @dbname + ' OK'
 
           # distinguish use of flat JSON batch sql interface
-          if !!a1 and a1 == 'a1'
+          if !!fjinfo and !!fjinfo.dbid
             console.log 'Detected Android/iOS/macOS platform version with flat JSON interface'
             useflatjson = true
 
@@ -442,6 +442,10 @@
       flatlist = []
       mycbmap = {}
 
+      # XXX TBD (bogus values)
+      flatlist.push 1111
+      flatlist.push 1111
+
       i = 0
       while i < batchExecutes.length
         request = batchExecutes[i]
@@ -456,6 +460,9 @@
           flatlist.push p
 
         i++
+
+      # XXX TBD (bogus)
+      flatlist.push 'xxx'
 
       mycb = (result) ->
         i = 0
@@ -505,16 +512,24 @@
             q.success { rows: rows, rowsAffected: changes, insertId: insert_id }
             ++ri
 
-          else if r == 'errormessage'
-            errormessage = result[ri++]
-            q.error { result: { message: errormessage } }
+          else if r == 'error' # updated for iOS/macOS
+            # should match evcore JSON interface:
+            c = result[ri++]
+            ri++ # ignored
+            m = result[ri++]
+            q.error { code: c, message: m }
 
           ++i
 
         return
 
-      cordova.exec mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch",
-        [{dbargs: {dbname: @db.dbname}, flen: batchExecutes.length, flatlist: flatlist}]
+      # FUTURE TBD support call on Android with @db.dbid
+      if !!@db.dbid
+        console.log 'not implemented'
+
+      else
+        cordova.exec mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch",
+          [{dbargs: {dbname: @db.dbname}, flen: batchExecutes.length, flatlist: flatlist}]
 
       return
 

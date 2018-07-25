@@ -180,10 +180,10 @@ Contact for commercial license: info@litehelpers.net
     } else {
       console.log('OPEN database: ' + this.dbname);
       opensuccesscb = (function(_this) {
-        return function(a1) {
+        return function(fjinfo) {
           var txLock;
           console.log('OPEN database: ' + _this.dbname + ' OK');
-          if (!!a1 && a1 === 'a1') {
+          if (!!fjinfo && !!fjinfo.dbid) {
             console.log('Detected Android/iOS/macOS platform version with flat JSON interface');
             useflatjson = true;
           }
@@ -411,6 +411,8 @@ Contact for commercial license: info@litehelpers.net
     var flatlist, i, l, len1, mycb, mycbmap, p, ref, request;
     flatlist = [];
     mycbmap = {};
+    flatlist.push(1111);
+    flatlist.push(1111);
     i = 0;
     while (i < batchExecutes.length) {
       request = batchExecutes[i];
@@ -427,8 +429,9 @@ Contact for commercial license: info@litehelpers.net
       }
       i++;
     }
+    flatlist.push('xxx');
     mycb = function(result) {
-      var c, changes, errormessage, insert_id, j, k, q, r, ri, rl, row, rows, v;
+      var c, changes, insert_id, j, k, m, q, r, ri, rl, row, rows, v;
       i = 0;
       ri = 0;
       rl = result.length;
@@ -476,26 +479,31 @@ Contact for commercial license: info@litehelpers.net
             insertId: insert_id
           });
           ++ri;
-        } else if (r === 'errormessage') {
-          errormessage = result[ri++];
+        } else if (r === 'error') {
+          c = result[ri++];
+          ri++;
+          m = result[ri++];
           q.error({
-            result: {
-              message: errormessage
-            }
+            code: c,
+            message: m
           });
         }
         ++i;
       }
     };
-    cordova.exec(mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch", [
-      {
-        dbargs: {
-          dbname: this.db.dbname
-        },
-        flen: batchExecutes.length,
-        flatlist: flatlist
-      }
-    ]);
+    if (!!this.db.dbid) {
+      console.log('not implemented');
+    } else {
+      cordova.exec(mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch", [
+        {
+          dbargs: {
+            dbname: this.db.dbname
+          },
+          flen: batchExecutes.length,
+          flatlist: flatlist
+        }
+      ]);
+    }
   };
 
   SQLitePluginTransaction.prototype.run_batch = function(batchExecutes, handlerFor) {

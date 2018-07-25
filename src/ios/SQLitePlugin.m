@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Chris Brody
+ * Copyright (C) 2012-2018 Christopher J. Brody
  * Copyright (C) 2011 Davide Bertola
  *
  * License for this version: GPL v3 (http://www.gnu.org/licenses/gpl.txt) or commercial license.
@@ -120,7 +120,9 @@
                 if(sqlite3_exec(db, (const char*)"SELECT count(*) FROM sqlite_master;", NULL, NULL, NULL) == SQLITE_OK) {
                     dbPointer = [NSValue valueWithPointer:db];
                     [openDBs setObject: dbPointer forKey: dbfilename];
-                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"a1"];
+                    NSMutableDictionary * fjinfo = [NSMutableDictionary dictionaryWithCapacity:0];
+                    [fjinfo setObject: [NSNumber numberWithInt:-1] forKey:@"dbid"];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:fjinfo];
                 } else {
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to open DB with key"];
                     // XXX TODO: close the db handle & [perhaps] remove from openDBs!!
@@ -224,7 +226,8 @@
 
     CDVPluginResult* pluginResult;
 
-    int ai = 0;
+    // Skip flatlist items that are used by Android-sqlite-evcore-native-driver
+    int ai = 2;
 
     @synchronized(self) {
         for (int i=0; i<sc; ++i) {
@@ -364,17 +367,22 @@
         /* add error with result.message: */
 
         // XXX FUTURE TBD: include full error object instead (??)
-        [results addObject:@"errormessage"];
-        //[results addObject:error];
+        [results addObject:@"error"];
+        [results addObject:[error objectForKey:@"code"]];
+        [results addObject:@"extra"]; // ignored (for now)
         [results addObject:[error objectForKey:@"message"]];
 
         return;
     }
 
     if (!hasRows) {
-        [results addObject:@"ch2"];
-        [results addObject:rowsAffected];
-        [results addObject:insertId];
+        if (diffRowsAffected > 0) {
+            [results addObject:@"ch2"];
+            [results addObject:rowsAffected];
+            [results addObject:insertId];
+        } else {
+            [results addObject:@"ok"];
+        }
     }
 }
 
@@ -434,9 +442,7 @@
 +(NSDictionary *)captureSQLiteErrorFromDb:(struct sqlite3 *)db
 {
     int code = sqlite3_errcode(db);
-#if 0 // XXX TBD NOT USED IN THIS VERSION:
     int webSQLCode = [SQLitePlugin mapSQLiteErrorCode:code];
-#endif
 #if INCLUDE_SQLITE_ERROR_INFO
     int extendedCode = sqlite3_extended_errcode(db);
 #endif
@@ -444,9 +450,7 @@
 
     NSMutableDictionary *error = [NSMutableDictionary dictionaryWithCapacity:4];
 
-#if 0 // XXX TBD NOT USED IN THIS VERSION:
     [error setObject:[NSNumber numberWithInt:webSQLCode] forKey:@"code"];
-#endif
     [error setObject:[NSString stringWithUTF8String:message] forKey:@"message"];
 
 #if INCLUDE_SQLITE_ERROR_INFO
@@ -458,7 +462,6 @@
     return error;
 }
 
-#if 0 // XXX TBD NOT USED IN THIS VERSION:
 +(int)mapSQLiteErrorCode:(int)code
 {
     // map the sqlite error code to
@@ -474,6 +477,5 @@
             return UNKNOWN_ERR;
     }
 }
-#endif
 
 @end /* vim: set expandtab : */

@@ -1,6 +1,6 @@
 {
   "name": "cordova-sqlite-evplus-legacy-common-exp-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Native interface to SQLite for PhoneGap/Cordova - evplus legacy common core version (limited functionality) with internal memory enhancements (not for production)",
   "cordova": {
     "id": "cordova-sqlite-evplus-legacy-common-exp-core",

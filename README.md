@@ -12,7 +12,7 @@ NOTE (TBD): no Circle CI or Travis CI working in this version branch.
 
 WARNING: This plugin version branch is not meant for production. There are multiple data loss risk issues that have been resolved in newer plugin versions. Other known data corruption risks such as "Multiple SQLite problem" are documented in newer plugin versions. There are additional known issues that have been resovled in newer plugin versions.
 
-XXX TBD JARs missing for Android platform in this plugin version branch (need to be copied manually)
+XXX TBD Android implementation not expected to work in this plugin version branch: flat JSON interface adjusted for iOS/macOS only; Android JARs not present
 
 ## Status
 
