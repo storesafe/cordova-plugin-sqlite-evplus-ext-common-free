@@ -339,7 +339,7 @@ var mytests = function() {
           })
         });
 
-        test_it(suiteName + 'test rowsAffected [advanced]', function () {
+        test_it(suiteName + 'test rowsAffected [advanced] [XXX TBD insertId value after INSERT OR IGNORE for iOS/macOS plugin vs Web SQL]', function () {
           // XXX STILL BROKEN for WINDOWS (8.1):
           if (isWindows) pending('BROKEN for Windows (8.1)'); // XXX TODO
 
@@ -355,17 +355,25 @@ var mytests = function() {
             // INSERT or IGNORE with the real thing:
             tx.executeSql('INSERT or IGNORE INTO characters VALUES (?,?,?)', ['Sonic', 'Sega', 0], function (tx, res) {
               expect(res.rowsAffected).toBe(1);
+              // FUTURE TODO check res.insertId on (WebKit) Web SQL & plugin on all platform ref:
+              // litehelpers/Cordova-sqlite-storage#802
               tx.executeSql('INSERT INTO characters VALUES (?,?,?)', ['Tails', 'Sega', 0], function (tx, res) {
                 expect(res.rowsAffected).toBe(1);
+                // FUTURE TODO check res.insertId on (WebKit) Web SQL & plugin on all platform ref:
+                // litehelpers/Cordova-sqlite-storage#802
                 tx.executeSql('INSERT INTO companies VALUES (?,?)', ['Sega', 1], function (tx, res) {
                   // XXX still fails on Windows (8.1):
                   expect(res.rowsAffected).toBe(1);
+                  // FUTURE TODO check res.insertId on (WebKit) Web SQL & plugin on all platform ref:
+                  // litehelpers/Cordova-sqlite-storage#802
                   // query with subquery
                   var sql = 'UPDATE characters ' +
                       ' SET fav=(SELECT fav FROM companies WHERE name=?)' +
                       ' WHERE creator=?';
                   tx.executeSql(sql, ['Sega', 'Sega'], function (tx, res) {
                     equal(res.rowsAffected, 2);
+                    // FUTURE TODO check res.insertId on (WebKit) Web SQL & plugin on all platform ref:
+                    // litehelpers/Cordova-sqlite-storage#802
                     // query with 2 subqueries
                     var sql = 'UPDATE characters ' +
                         ' SET fav=(SELECT fav FROM companies WHERE name=?),' +
@@ -376,6 +384,14 @@ var mytests = function() {
                       // knockoffs shall be ignored:
                       tx.executeSql('INSERT or IGNORE INTO characters VALUES (?,?,?)', ['Sonic', 'knockoffs4you', 0], function (tx, res) {
                         equal(res.rowsAffected, 0);
+                        // XXX CHECK insertId here in this plugin version branch
+                        // (already tested in basic-db-tx-sql-storage-results.js in newer plugin versions)
+                        // FUTURE TODO check res.insertId on (WebKit) Web SQL & plugin on all platform ref:
+                        // litehelpers/Cordova-sqlite-storage#802
+                        if (isWebSql)
+                          expect(res.insertId > 0).toBe(true); // previous insertId value for (WebKit) Web SQL [known deviation]
+                        if (!isWebSql && !isWindows && !isAndroid)
+                          expect(res.insertId).toBe(1); // XXX previous insertId on iOS/macOS plugin (INCONSISTENT with newer plugin versions)
 
                         start();
                       }, function(tx, err) {
