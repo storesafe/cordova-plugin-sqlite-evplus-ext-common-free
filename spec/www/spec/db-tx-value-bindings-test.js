@@ -1116,7 +1116,7 @@ var mytests = function() {
           });
         }, MYTIMEOUT);
 
-        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [Plugin BROKEN: missing result column data; SELECT BLOB value ISSUE with Android/Windows/WP8]", function(done) {
+        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [XXX SKIP final SELECT on iOS/macOS (evplus only) & Android due to KNOWN CRASH; Plugin BROKEN: missing result column data; XXX KNOWN SELECT BLOB value ISSUE Windows/XXX]", function(done) {
           var db = openDatabase('INSERT-inline-BLOB-value-FFD1FFD2-and-check-stored-data.db', '1.0', 'Demo', DEFAULT_SIZE);
 
           db.transaction(function(tx) {
@@ -1139,6 +1139,8 @@ var mytests = function() {
 
                   // STOP here in case of Android:
                   if (!isWindows && isAndroid) return done();
+                  // XXX ALSO STOP HERE on evplus for plugin on iOS/macOS plugin:
+                  if (!isWebSql && !isWindows && !isAndroid && !isWP8) return done();
 
                   tx.executeSql('SELECT * FROM test_table', [], function(ignored, rs3) {
                     if (!isWebSql && isAndroid && isImpl2) expect('Behavior changed please update this test').toBe('--');

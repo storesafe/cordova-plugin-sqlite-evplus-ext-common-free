@@ -7,6 +7,8 @@
 - Translated to Coffee-Script using js2coffee tool by @brodybits (Chris Brody)
 - API changes by @brodybits (Chris Brody)
 - Transaction timing fixes to support PouchDB by @nolanlawson
+- Android JSON memory fix by @brodybits (Chris Brody)
+- _Premium performance and memory usage enhancements by @brodybits (Chris Brody)_
 
 ## Android version
 
@@ -15,12 +17,16 @@
 - Maintained by @brodybits (Chris Brody)
 - Fixes to support old Android versions by @nolanlawson
 - Thanks to Mark Oppenheim <mark.oppenheim@mnetics.co.uk> for fixes to open/close callbacks and repeated open/close/delete operations
-
+- Android JSON memory fix by @brodybits (Chris Brody)
+- _evcore enhancements by @brodybits (Chris Brody)_
+- _Premium performance and memory usage enhancements by @brodybits (Chris Brody)_
+ 
 ## iOS/macOS version
 
 - Original authors: @davibe (Davide Bertola <dade@dadeb.it>) and @joenoon (Joe Noon <joenoon@gmail.com>)
 - Cordova 2.7+ port with background processing by @j3k0 (Jean-Christophe Hoelt <hoelt@fovea.cc>)
 - Maintained by @brodybits (Chris Brody)
+- _Premium performance and memory usage enhancements by @brodybits (Chris Brody)_
 
 ## Windows version
 

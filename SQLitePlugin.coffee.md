@@ -230,7 +230,9 @@
           # NOTE: the db state is NOT stored (in @openDBs) if the db was closed or deleted.
           console.log 'OPEN database: ' + @dbname + ' - OK'
 
+          # distinguish use of flat JSON batch sql interface
           if !!fjinfo and !!fjinfo.dbid
+            console.log 'Detected Android/iOS/macOS platform version with flat JSON interface'
             @dbidmap[@dbname] = @dbid = fjinfo.dbid
             @fjmap[@dbname] = true
 
@@ -631,6 +633,10 @@
       if @db.dbid isnt -1
         cordova.exec mycb, null, "SQLitePlugin", "fj:#{flatlist.length};extra", flatlist
 
+      else
+        cordova.exec mycb, null, "SQLitePlugin", "fj",
+          [{dbargs: {dbname: @db.dbname}, flen: batchExecutesLength, flatlist: flatlist}]
+
       return
 
     # version for platforms with no flat JSON interface:
@@ -663,7 +669,7 @@
         for resultIndex in [0 .. result.length-1]
           r = result[resultIndex]
           type = r.type
-          # NOTE: r.qid can be ignored
+          # NOTE: r.qid ignored (if present)
           res = r.result
 
           q = mycbmap[resultIndex]
@@ -671,6 +677,8 @@
           if q
             if q[type]
               q[type] res
+
+          ++i
 
         return
 

@@ -1,4 +1,4 @@
-# Cordova/PhoneGap sqlite storage - premium enterprise version with performance improvements for Android and TBD limited extra features
+# Cordova/PhoneGap sqlite storage - premium enterprise version with premium performance improvements and TBD limited extra features
 
 Native SQLite component with API based on HTML5/[Web SQL (DRAFT) API](http://www.w3.org/TR/webdatabase/) for the following platforms:
 - Android
@@ -34,9 +34,11 @@ New release in July 2018 will include the following major enhancements ([litehel
 
 ## About this plugin version
 
-_Premium enterprise version with additional performance improvements for Android - common version branch with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm_.
+_Premium enterprise version with additional performance improvements for Android, iOS, and macOS - common version branch with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm_.
 
+<!-- XXX GONE:
 __XXX TODO evplus feature MISSING in this plugin version: iOS performance enhancements ref: [litehelpers/cordova-plugin-sqlite-evplus-ext-common-free#2](https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free/issues/2)__
+- -->
 
 TBD NOTE: This version branch has external sqlite3 dependencies that are installed by a before_plugin_install hook. FUTURE TBD sqlite3 dependencies will be included if needed by any commercial users for PhoneGap Build or any other build tools.
 
@@ -48,7 +50,7 @@ TBD NOTE: This version branch has external sqlite3 dependencies that are install
 
 ### Multiple SQLite problem on Android
 
-This plugin uses a non-standard [Android-sqlite-connector](https://github.com/liteglue/Android-sqlite-connector) implementation on Android. In case an application access the SAME database using multiple plugins there is a risk of data corruption ref: [litehelpers/Cordova-sqlite-storage#626](https://github.com/litehelpers/Cordova-sqlite-storage/issues/626)) as described in <http://ericsink.com/entries/multiple_sqlite_problem.html> and <https://www.sqlite.org/howtocorrupt.html>.
+This plugin uses _non-standard [litehelpers / Android-sqlite-evcore-native-driver-free](https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free) sqlite database access implementation_ on Android. In case an application access the SAME database using multiple plugins there is a risk of data corruption ref: [litehelpers/Cordova-sqlite-storage#626](https://github.com/litehelpers/Cordova-sqlite-storage/issues/626)) as described in <http://ericsink.com/entries/multiple_sqlite_problem.html> and <https://www.sqlite.org/howtocorrupt.html>.
 
 The workaround is to use the `androidDatabaseImplementation: 2` setting as described in the **Android sqlite implementation** section below:
 
@@ -254,6 +256,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
 
 ## Announcements
 
+- This plugin version branch includes premium improvements to the internal JSON interface between Javascript and native parts on Android, iOS, and macOS which improves the performance and resolves memory issues in case of some very large SQL batches.
 - This plugin version includes additional JavaScript performance enhancements with special benefit for Android.
 - Using recent version of SQLite3 (`3.22.0`) with `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE) build setting to be extra robust against possible database corruption ref: [litehelpers/Cordova-sqlite-storage#736](https://github.com/litehelpers/Cordova-sqlite-storage/issues/736)
 - Nice overview of alternatives for storing local data in Cordova apps at: <https://www.sitepoint.com/storing-local-data-in-a-cordova-app/>
@@ -535,7 +538,7 @@ As "strongly recommended" by [Web SQL Database API 8.5 SQL injection](https://ww
 - Issues with error code on Windows as well as Android with the `androidDatabaseImplementation: 2` setting described below.
 - In case of an issue that causes an API function to throw an exception (Android/iOS WebKit) Web SQL includes includes a code member with value of 0 (SQLError.UNKNOWN_ERR) in the exception while the plugin includes no such code member.
 - This plugin supports some non-standard features as documented below.
-- Results of SELECT with BLOB data such as `SELECT LOWER(X'40414243') AS myresult`, `SELECT X'40414243' AS myresult`, or reading data stored by `INSERT INTO MyTable VALUES (X'40414243')` are not consistent on Android in case the built-in Android database is used (using the `androidDatabaseImplementation: 2` setting in `window.sqlitePlugin.openDatabase`) or Windows. (These work with Android/iOS WebKit Web SQL and have been supported by SQLite for a number of years.)
+- Results of SELECT with BLOB data such as `SELECT LOWER(X'40414243') AS myresult`, `SELECT X'40414243' AS myresult`, or reading data stored by `INSERT INTO MyTable VALUES (X'40414243')` are not consistent on Android in case the built-in Android database is used (using the `androidDatabaseImplementation: 2` setting in `window.sqlitePlugin.openDatabase`) or Windows. _Possible crash in ths plugin version on Android/iOS/macOS._ (These work with Android/iOS WebKit Web SQL and have been supported by SQLite for a number of years.)
 - Whole number parameter argument values such as `42`, `-101`, or `1234567890123` are handled as INTEGER values by this plugin on Android, iOS (default UIWebView), and Windows while they are handled as REAL values by (WebKit) Web SQL and by this plugin on iOS with WKWebView (using cordova-plugin-wkwebview-engine) or macOS ("osx"). This is evident in certain test operations such as `SELECT ? as myresult` or `SELECT TYPEOF(?) as myresult` and storage in a field with TEXT affinity.
 - INTEGER, REAL, +/- `Infinity`, `NaN`, `null`, `undefined` parameter argument values are handled as TEXT string values on Android in case the built-in Android database (`androidDatabaseImplementation: 2` setting) is used. (This is evident in certain test operations such as `SELECT ? as myresult` or `SELECT TYPEOF(?) as myresult` and storage in a field with TEXT affinity.)
 - In case of invalid transaction callback arguments such as string values the plugin attempts to execute the transaction while (WebKit) Web SQL would throw an exception.

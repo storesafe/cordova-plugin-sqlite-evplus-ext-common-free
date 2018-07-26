@@ -187,6 +187,7 @@ Contact for commercial license: sales@litehelpers.net
           var txLock;
           console.log('OPEN database: ' + _this.dbname + ' - OK');
           if (!!fjinfo && !!fjinfo.dbid) {
+            console.log('Detected Android/iOS/macOS platform version with flat JSON interface');
             _this.dbidmap[_this.dbname] = _this.dbid = fjinfo.dbid;
             _this.fjmap[_this.dbname] = true;
           }
@@ -546,6 +547,16 @@ Contact for commercial license: sales@litehelpers.net
     };
     if (this.db.dbid !== -1) {
       cordova.exec(mycb, null, "SQLitePlugin", "fj:" + flatlist.length + ";extra", flatlist);
+    } else {
+      cordova.exec(mycb, null, "SQLitePlugin", "fj", [
+        {
+          dbargs: {
+            dbname: this.db.dbname
+          },
+          flen: batchExecutesLength,
+          flatlist: flatlist
+        }
+      ]);
     }
   };
 
@@ -583,6 +594,7 @@ Contact for commercial license: sales@litehelpers.net
             q[type](res);
           }
         }
+        ++i;
       }
     };
     cordova.exec(mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch", [
