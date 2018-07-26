@@ -206,14 +206,14 @@
 }
 
 
--(void) backgroundExecuteSqlBatch: (CDVInvokedUrlCommand*)command
+-(void) fj: (CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
-        [self executeSqlBatch: command];
+        [self fjnow: command];
     }];
 }
 
--(void) executeSqlBatch: (CDVInvokedUrlCommand*)command
+-(void) fjnow: (CDVInvokedUrlCommand*)command
 {
     NSMutableDictionary *options = [command.arguments objectAtIndex:0];
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:0];
@@ -235,7 +235,7 @@
             NSNumber *pc = [flatlist objectAtIndex:(ai++)];
             int params_count = [pc integerValue];
 
-            [self executeSql:sql withParams:flatlist first:ai count:params_count onDatabaseName:dbFileName results:results];
+            [self fjsql:sql withParams:flatlist first:ai count:params_count onDatabaseName:dbFileName results:results];
             ai += params_count;
         }
 
@@ -245,21 +245,9 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
--(void)executeSql: (NSString*)sql withParams: (NSMutableArray*)params first: (int)first count:(int)params_count onDatabaseName: (NSString*)dbFileName results: (NSMutableArray*)results
+-(void)fjsql: (NSString*)sql withParams: (NSMutableArray*)params first: (int)first count:(int)params_count onDatabaseName: (NSString*)dbFileName results: (NSMutableArray*)results
 {
-#if 0 // XXX TODO check in executeSqlBatch: [should NEVER occur]:
-    if (dbFileName == NULL) {
-        return [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"You must specify database path"];
-    }
-#endif
-
     NSValue *dbPointer = [openDBs objectForKey:dbFileName];
-
-#if 0 // XXX TODO check in executeSqlBatch: [should NEVER occur]:
-    if (dbPointer == NULL) {
-        return [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No such database, you must open it first"];
-    }
-#endif
 
     sqlite3 *db = [dbPointer pointerValue];
 

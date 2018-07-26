@@ -494,7 +494,7 @@ Contact for commercial license: info@litehelpers.net
     if (!!this.db.dbid) {
       console.log('not implemented');
     } else {
-      cordova.exec(mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch", [
+      cordova.exec(mycb, null, "SQLitePlugin", "fj", [
         {
           dbargs: {
             dbname: this.db.dbname

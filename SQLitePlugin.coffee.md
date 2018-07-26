@@ -528,7 +528,7 @@
         console.log 'not implemented'
 
       else
-        cordova.exec mycb, null, "SQLitePlugin", "backgroundExecuteSqlBatch",
+        cordova.exec mycb, null, "SQLitePlugin", "fj",
           [{dbargs: {dbname: @db.dbname}, flen: batchExecutes.length, flatlist: flatlist}]
 
       return
