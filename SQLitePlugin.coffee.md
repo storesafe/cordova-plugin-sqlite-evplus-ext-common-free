@@ -32,9 +32,6 @@
     # XXX TBD this will be renamed and include some more per-db state.
     txLocks = {}
 
-    # Indicate if the platform implementation (Android/iOS/macOS) requires flat JSON interface
-    useflatjson = false
-
 ## utility functions:
 
     # Errors returned to callbacks must conform to `SqlError` with a code and message.
@@ -122,6 +119,8 @@
     # XXX TBD this will be moved and renamed or
     # combined with txLocks.
     SQLitePlugin::openDBs = {}
+
+    SQLitePlugin::fjstate = {}
 
     SQLitePlugin::addTransaction = (t) ->
       if !txLocks[@dbname]
@@ -223,7 +222,7 @@
           # distinguish use of flat JSON batch sql interface
           if !!fjinfo and !!fjinfo.dbid
             console.log 'Detected Android/iOS/macOS platform version with flat JSON interface'
-            useflatjson = true
+            @fjstate.dbid = fjinfo.dbid
 
           #if !@openDBs[@dbname] then call open error cb, and abort pending tx if any
           if !@openDBs[@dbname]
@@ -431,7 +430,7 @@
 
           return
 
-      if useflatjson
+      if !!@db.fjstate.dbid
         @run_batch_flatjson batchExecutes, handlerFor
       else
         @run_batch batchExecutes, handlerFor
@@ -439,6 +438,7 @@
 
     # version for Android/iOS/macOS with flat JSON interface
     SQLitePluginTransaction::run_batch_flatjson = (batchExecutes, handlerFor) ->
+      batchExecutesLength = batchExecutes.length
       flatlist = []
       mycbmap = {}
 
@@ -447,7 +447,7 @@
       flatlist.push 1111
 
       i = 0
-      while i < batchExecutes.length
+      while i < batchExecutesLength
         request = batchExecutes[i]
 
         mycbmap[i] =
@@ -529,7 +529,7 @@
 
       else
         cordova.exec mycb, null, "SQLitePlugin", "fj",
-          [{dbargs: {dbname: @db.dbname}, flen: batchExecutes.length, flatlist: flatlist}]
+          [{dbargs: {dbname: @db.dbname}, flen: batchExecutesLength, flatlist: flatlist}]
 
       return
 
