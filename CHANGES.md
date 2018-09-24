@@ -1,5 +1,18 @@
 # Changes
 
+## cordova-plugin-sqlite-evplus-ext-common-free 0.1.4
+
+### cordova-sqlite-evcore-common-free 0.0.2
+
+- Use cordova-sqlite-evcore-free-dependencies 0.8.4 with quick fix for error messages on Android
+
+#### cordova-sqlite-storage 2.4.0
+
+- Report internal plugin error in case of attempt to open database with no database name on iOS or macOS
+- Cover use of standard (WebKit) Web SQL API in spec test suite
+- Test and document insertId in UPDATE result set on plugin vs (WebKit) Web SQL
+- other test updates
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.1.3
 
 - Use Array.prototype.concat to solve perf issue
@@ -60,7 +73,7 @@
 
 ### cordova-sqlite-evcore-legacy-ext-common-free 0.0.6
 
-- Use cordova-sqlite-evcore-free-dependencies 0.8.2 with fix for multi-byte UTF-8 characters on Android ref:
+- Use cordova-sqlite-evcore-free-dependencies 0.8.3 with fix for multi-byte UTF-8 characters on Android ref:
   - litehelpers/Cordova-sqlite-evcore-extbuild-free#19 (<https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free/issues/19>)
   - litehelpers/Android-sqlite-evcore-native-driver-free#1 (<https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free/pull/1>)
   - litehelpers/Android-sqlite-evcore-native-driver-free#2 (<https://github.com/litehelpers/Android-sqlite-evcore-native-driver-free/pull/2>)

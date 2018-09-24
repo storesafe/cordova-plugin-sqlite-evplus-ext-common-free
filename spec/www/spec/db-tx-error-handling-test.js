@@ -2,11 +2,20 @@
 
 var MYTIMEOUT = 20000;
 
-var DEFAULT_SIZE = 5000000; // max to avoid popup in safari/ios
+// NOTE: DEFAULT_SIZE wanted depends on type of browser
 
-var isWP8 = /IEMobile/.test(navigator.userAgent); // Matches WP(7/8/8.1)
-var isWindows = /Windows /.test(navigator.userAgent); // Windows
+var isWindows = /MSAppHost/.test(navigator.userAgent);
 var isAndroid = !isWindows && /Android/.test(navigator.userAgent);
+var isFirefox = /Firefox/.test(navigator.userAgent);
+var isWebKitBrowser = !isWindows && !isAndroid && /Safari/.test(navigator.userAgent);
+var isBrowser = isWebKitBrowser || isFirefox;
+var isEdgeBrowser = isBrowser && (/Edge/.test(navigator.userAgent));
+var isChromeBrowser = isBrowser && !isEdgeBrowser && (/Chrome/.test(navigator.userAgent));
+var isSafariBrowser = isWebKitBrowser && !isEdgeBrowser && !isChromeBrowser;
+
+// should avoid popups (Safari seems to count 2x)
+var DEFAULT_SIZE = isSafariBrowser ? 2000000 : 5000000;
+// FUTURE TBD: 50MB should be OK on Chrome and some other test browsers.
 
 // NOTE: While in certain version branches there is no difference between
 // the default Android implementation and implementation #2,
@@ -18,20 +27,26 @@ var scenarioList = [
   'Plugin-implementation-2'
 ];
 
-var scenarioCount = (!!window.hasWebKitBrowser) ? (isAndroid ? 3 : 2) : 1;
+var scenarioCount = (!!window.hasWebKitWebSQL) ? (isAndroid ? 3 : 2) : 1;
 
 var mytests = function() {
 
   for (var i=0; i<scenarioCount; ++i) {
+    // TBD skip plugin test on browser platform (not yet supported):
+    if (isBrowser && (i === 0)) continue;
 
     describe(scenarioList[i] + ': tx error handling (detailed tx error handling) test(s)', function() {
       var scenarioName = scenarioList[i];
       var suiteName = scenarioName + ': ';
       var isWebSql = (i === 1);
       var isImpl2 = (i === 2);
+      // XXX TBD WORKAROUND SOLUTION for (WebKit) Web SQL on Safari browser (TEST DB NAME IGNORED):
+      var recycleWebDatabase = null;
 
       // NOTE: MUST be defined in function scope, NOT outer scope:
       var openDatabase = function(name, ignored1, ignored2, ignored3) {
+        if (isWebSql && isSafariBrowser && !!recycleWebDatabase)
+          return recycleWebDatabase;
         if (isImpl2) {
           return window.sqlitePlugin.openDatabase({
             // prevent reuse of database from default db implementation:
@@ -42,7 +57,8 @@ var mytests = function() {
           });
         }
         if (isWebSql) {
-          return window.openDatabase(name, '1.0', 'Test', DEFAULT_SIZE);
+          return recycleWebDatabase =
+            window.openDatabase(name, '1.0', 'Test', DEFAULT_SIZE);
         } else {
           return window.sqlitePlugin.openDatabase({name: name, location: 0});
         }
@@ -81,9 +97,7 @@ var mytests = function() {
             expect(error.code).toBeDefined();
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else if (isWebSql && isAndroid)
               expect(true).toBe(true); // SKIP for now
@@ -529,6 +543,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP (for now)
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/1 argument required.*but only 0 present/);
             else
               expect(ex.message).toMatch(/Not enough arguments/);
           }
@@ -584,6 +600,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP (for now)
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/1 argument required.*but only 0 present/);
             else
               expect(ex.message).toMatch(/Not enough arguments/);
           }
@@ -638,6 +656,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -688,6 +708,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -738,6 +760,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -788,6 +812,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isChromeBrowser)
+              expect(ex.message).toMatch(/callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -838,6 +864,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -888,6 +916,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -938,6 +968,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -988,6 +1020,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -1038,6 +1072,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -1088,6 +1124,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -1138,6 +1176,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.transaction must be a function/);
           }
@@ -1188,6 +1228,8 @@ var mytests = function() {
               expect(ex.message).toMatch(/transaction expected a function/);
             else if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 1 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 1 \('callback'\) to Database\.readTransaction must be a function/);
           }
@@ -1236,6 +1278,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 3 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 3 \('successCallback'\) to Database\.transaction must be a function/);
           }
@@ -1284,6 +1328,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 3 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 3 \('successCallback'\) to Database\.readTransaction must be a function/);
           }
@@ -1332,6 +1378,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 2 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 2 \('errorCallback'\) to Database\.transaction must be a function/);
           }
@@ -1380,6 +1428,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*callback provided as parameter 2 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 2 \('errorCallback'\) to Database\.readTransaction must be a function/);
           }
@@ -1428,6 +1478,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 3 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 3 \('successCallback'\) to Database\.transaction must be a function/);
           }
@@ -1476,6 +1528,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*parameter 3 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 3 \('successCallback'\) to Database\.readTransaction must be a function/);
           }
@@ -1524,6 +1578,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*transaction.*callback provided as parameter 2 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 2 \('errorCallback'\) to Database\.transaction must be a function/);
           }
@@ -1572,6 +1628,8 @@ var mytests = function() {
 
             if (isAndroid)
               expect(true).toBe(true); // SKIP for now
+            else if (isWebSql && isChromeBrowser)
+              expect(ex.message).toMatch(/Failed to execute.*readTransaction.*parameter 2 is not an object/);
             else
               expect(ex.message).toMatch(/Argument 2 \('errorCallback'\) to Database\.readTransaction must be a function/);
           }
@@ -1750,19 +1808,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql)
+            if (!isWebSql)
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(1);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: SQLite3 step error result code: 21/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code 21/);
+              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code: 21 message: not an error/);
             else if (isAndroid && isImpl2)
               expect(error.message).toMatch(/a statement with no error handler failed: query not found/);
             else if (!isWebSql)
@@ -1818,19 +1872,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql)
+            if (!isWebSql)
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(1);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: SQLite3 step error result code: 21/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code 21/);
+              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code: 21 message: not an error/);
             else if (isAndroid && isImpl2)
               expect(error.message).toMatch(/a statement with no error handler failed: query not found/);
             else if (!isWebSql)
@@ -1886,19 +1936,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql)
+            if (!isWebSql)
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(1);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: SQLite3 step error result code: 21/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code 21/);
+              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code: 21 message: not an error/);
             else if (isAndroid && isImpl2)
               expect(error.message).toMatch(/a statement with no error handler failed: query not found/);
             else if (!isWebSql)
@@ -1955,19 +2001,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql)
+            if (!isWebSql)
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(1);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: SQLite3 step error result code: 21/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code 21/);
+              expect(error.message).toMatch(/a statement with no error handler failed: other error.*code: 21 message: not an error/);
             else if (isAndroid && isImpl2)
               expect(error.message).toMatch(/a statement with no error handler failed: query not found/);
             else if (!isWebSql)
@@ -2024,19 +2066,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*object Object.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"\[object Object\]\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2094,19 +2132,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*object Object.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"\[object Object\]\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2164,19 +2198,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*first.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"first\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2230,19 +2260,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*101.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"101\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2297,19 +2323,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*0.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"0\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2494,19 +2516,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*true.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"true\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2560,19 +2578,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .*false.*: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"false\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2626,19 +2640,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .Infinity.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"Infinity\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2691,19 +2701,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .-.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"-\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2756,19 +2762,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .NaN.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"NaN\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2821,19 +2823,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows || (isAndroid && isImpl2))
+            if (isWindows || (isAndroid && isImpl2))
               expect(error.code).toBe(0);
             else
               expect(error.code).toBe(5);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .NaN.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed:.*near \"NaN\": syntax error/);
             else if (isWebSql && !(/Android 4.[1-3]/.test(navigator.userAgent)))
@@ -2950,6 +2948,7 @@ var mytests = function() {
               expect(ex).toBeDefined();
 
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -2959,9 +2958,7 @@ var mytests = function() {
 
               expect(ex.message).toBeDefined();
 
-              if (isWP8)
-                expect(true).toBe(true); // SKIP for now
-              else if (isWindows)
+              if (isWindows)
                 expect(ex.message).toMatch(/Unable to get property 'toString' of undefined or null reference/);
               else if (!isWebSql && isAndroid)
                 expect(ex.message).toMatch(/Cannot .* 'toString' of undefined/);
@@ -2979,9 +2976,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Unable to get property 'toString' of undefined or null reference/);
             else if (!isWebSql && isAndroid)
               expect(error.message).toMatch(/Cannot .* 'toString' of undefined/);
@@ -3035,6 +3030,7 @@ var mytests = function() {
               expect(ex).toBeDefined();
 
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3044,9 +3040,7 @@ var mytests = function() {
 
               expect(ex.message).toBeDefined();
 
-              if (isWP8)
-                expect(true).toBe(true); // SKIP for now
-              else if (isWindows)
+              if (isWindows)
                 expect(ex.message).toMatch(/Unable to get property 'toString' of undefined or null reference/);
               else if (!isWebSql && isAndroid)
                 expect(ex.message).toMatch(/Cannot .* 'toString' of undefined/);
@@ -3064,9 +3058,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Unable to get property 'toString' of undefined or null reference/);
             else if (!isWebSql && isAndroid)
               expect(error.message).toMatch(/Cannot .* 'toString' of undefined/);
@@ -3129,6 +3121,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3178,6 +3171,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3227,6 +3221,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3276,6 +3271,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3534,6 +3530,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3552,9 +3549,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Function expected/);
             else if (!isWebSql)
               expect(error.message).toMatch(/is not a function/);
@@ -3586,6 +3581,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3604,9 +3600,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Function expected/);
             else if (!isWebSql)
               expect(error.message).toMatch(/is not a function/);
@@ -3638,6 +3632,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3654,19 +3649,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql && !isWindows && !(isAndroid && isImpl2))
+            if (!isWebSql && !isWindows && !(isAndroid && isImpl2))
               expect(error.code).toBe(5);
             else
               expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .SLCT.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed.*near \"SLCT\": syntax error/);
             else
@@ -3697,6 +3688,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3713,19 +3705,15 @@ var mytests = function() {
             expect(error.code).toBeDefined()
             expect(error.message).toBeDefined();
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (!isWebSql && !isWindows && !(isAndroid && isImpl2))
+            if (!isWebSql && !isWindows && !(isAndroid && isImpl2))
               expect(error.code).toBe(5);
             else
               expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/a statement with no error handler failed: Error preparing an SQLite statement/);
             else if (!isWebSql && isAndroid && !isImpl2)
-              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code 1/);
+              expect(error.message).toMatch(/a statement with no error handler failed: syntax error or other error.*code: 1 message: near .SLCT.: syntax error/);
             else if (!isWebSql)
               expect(error.message).toMatch(/a statement with no error handler failed.*near \"SLCT\": syntax error/);
             else
@@ -3758,6 +3746,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3808,6 +3797,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3856,6 +3846,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3874,9 +3865,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Function expected/);
             else if (!isWebSql)
               expect(error.message).toMatch(/is not a function/);
@@ -3907,6 +3896,7 @@ var mytests = function() {
               if (!isWebSql) expect('Plugin behavior changed please update this test').toBe('--');
               expect(ex).toBeDefined();
               if (isWebSql &&
+                  !isBrowser &&
                   ((isAndroid && (/Android 4/.test(navigator.userAgent))) ||
                    (isAndroid && (/Android 5.0/.test(navigator.userAgent))) ||
                    (!isAndroid && !(/OS 1[1-9]/.test(navigator.userAgent)))))
@@ -3925,9 +3915,7 @@ var mytests = function() {
 
             expect(error.code).toBe(0);
 
-            if (isWP8)
-              expect(true).toBe(true); // SKIP for now
-            else if (isWindows)
+            if (isWindows)
               expect(error.message).toMatch(/Function expected/);
             else if (!isWebSql)
               expect(error.message).toMatch(/is not a function/);
