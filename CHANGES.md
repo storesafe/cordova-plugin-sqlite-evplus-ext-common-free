@@ -1,5 +1,9 @@
 # Changes
 
+## cordova-plugin-sqlite-evplus-ext-common-free 0.1.3
+
+- Use Array.prototype.concat to solve perf issue
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.1.2
 
 - include premium JSON improvements for iOS/macOS

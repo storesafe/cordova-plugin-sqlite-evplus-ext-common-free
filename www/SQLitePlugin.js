@@ -466,11 +466,9 @@ Contact for commercial license: sales@litehelpers.net
 
   SQLitePluginTransaction.prototype.run_batch_flatjson = function(batchExecutesLength, flatBatchExecutes, handlerFor) {
     var flatlist, mycb;
-    flatlist = [];
     this.db.dbid = this.db.dbidmap[this.db.dbname];
-    flatlist.push(this.db.dbid);
-    flatlist.push(batchExecutesLength);
-    Array.prototype.push.apply(flatlist, flatBatchExecutes);
+    flatlist = [this.db.dbid, batchExecutesLength];
+    flatlist = flatlist.concat(flatBatchExecutes);
     flatlist.push('extra');
     mycb = function(result) {
       var c, changes, code, errormessage, i, insert_id, j, k, r, ri, rl, row, rows, v;

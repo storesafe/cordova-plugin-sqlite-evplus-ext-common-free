@@ -534,18 +534,16 @@
 
     # version with flat JSON interface
     SQLitePluginTransaction::run_batch_flatjson = (batchExecutesLength, flatBatchExecutes, handlerFor) ->
-      flatlist = []
-
       # XXX TBD evidently not always set in SQLitePlugin::open
       # FUTURE TBD more elegant solution that may possibly be more efficient
       @db.dbid = @db.dbidmap[@db.dbname]
 
-      flatlist.push @db.dbid
-      flatlist.push batchExecutesLength
+      flatlist = [@db.dbid, batchExecutesLength]
 
-      # THANKS for GUIDANCE:
+      # Use Array.prototype.concat since Array.prototype.push should not be applied on
+      # applied on large number of elements ref:
       # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push#Merging_two_arrays
-      Array.prototype.push.apply(flatlist, flatBatchExecutes)
+      flatlist = flatlist.concat(flatBatchExecutes)
 
       flatlist.push 'extra'
 
