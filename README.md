@@ -12,7 +12,7 @@ This plugin version uses a special Android NDK sqlite database access library (C
 
 This plugin version is available under GPL v3 (<https://www.gnu.org/licenses/gpl-3.0.txt>) or commercial license options and includes components available under the MIT and Apache 2.0 licenses listed in [LICENSE.md](./LICENSE.md). Contact for commercial license: <sales@litehelpers.net>
 
-**NOTICE:** _Commercial licenses for [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free) and [litehelpers / Cordova-sqlite-enterprise-free](https://github.com/litehelpers/Cordova-sqlite-enterprise-free) are NOT valid for this plugin version. For an upgrade please contact: <sales@litehelpers.net>_
+**NOTICE:** Commercial licenses for [litehelpers / Cordova-sqlite-evcore-extbuild-free](https://github.com/litehelpers/Cordova-sqlite-evcore-extbuild-free) and [litehelpers / Cordova-sqlite-enterprise-free](https://github.com/litehelpers/Cordova-sqlite-enterprise-free) are **not** valid for this plugin version. For an upgrade please contact: <sales@litehelpers.net>
 
 ## WARNING: Multiple SQLite problem on all platforms
 
@@ -34,13 +34,9 @@ New release in September 2018 will include the following major enhancements ([li
 
 ## About this plugin version
 
-_Premium enterprise version with additional performance improvements for Android, iOS, and macOS - common version branch with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm_.
+Premium enterprise version with additional performance improvements for Android, iOS, and macOS - evplus common version with limited extra features (missing pre-populated database support), using the `before_plugin_install` hook to fetch the sqlite3 component dependencies from `cordova-sqlite-evcore-free-dependencies` via npm.
 
-<!-- XXX GONE:
-__XXX TODO evplus feature MISSING in this plugin version: iOS performance enhancements ref: [litehelpers/cordova-plugin-sqlite-evplus-ext-common-free#2](https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free/issues/2)__
-- -->
-
-TBD NOTE: This version branch has external sqlite3 dependencies that are installed by a before_plugin_install hook. FUTURE TBD sqlite3 dependencies will be included if needed by any commercial users for PhoneGap Build or any other build tools.
+NOTE: This plugin version has external sqlite3 dependencies that are installed by a before_plugin_install hook. FUTURE TBD sqlite3 dependencies will be included if needed by any commercial users for PhoneGap Build or any other build tools.
 
 <!-- FUTURE TBD critical bug notices for this plugin version -->
 
@@ -373,10 +369,10 @@ The Windows platform can present a number of challenges which increase when usin
 
 ### Quick installation
 
-_Use the following command to install this plugin version branch using the Cordova CLI_:
+Use the following command to install this plugin version branch using the Cordova CLI:
 
 ```shell
-cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # --save RECOMMENDED for Cordova CLI pre-7.0
+cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # --save *recommended* for Cordova CLI pre-7.0
 ```
 
 Add any desired platform(s) if not already present, for example:
@@ -1418,11 +1414,7 @@ Other resource (apparently for Ionic 1): <https://www.packtpub.com/books/content
 ## Easy installation with Cordova CLI tool
 
 ```shell
-npm install -g cordova # (in case you don't have cordova)
-cordova create MyProjectFolder com.my.project MyProject && cd MyProjectFolder # if you are just starting
-cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # XXX --save RECOMMENDED for Cordova CLI pre-7.0
-cordova platform add <desired platform> # repeat for all desired platform(s)
-cordova prepare # OPTIONAL (MAY BE NEEDED cordova-ios pre-4.3.0 (Cordova CLI pre-6.4.0))
+cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # --save *recommended* for Cordova CLI pre-7.0
 ```
 
 **Additional Cordova CLI NOTES:**
