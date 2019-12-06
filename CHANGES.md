@@ -1,8 +1,35 @@
 # Changes
 
-## cordova-plugin-sqlite-evplus-ext-common-free 0.1.5-pre1
+## cordova-plugin-sqlite-evplus-ext-common-free 0.1.5-rc1
 
-TBD
+### cordova-sqlite-evcore-commoncore-free 0.0.2
+
+- use & test with cordova-sqlite-evcore-free-dependencies@0.9.2 with SQLite 3.30.1 update
+
+### cordova-sqlite-evcore-commoncore-free 0.0.1
+
+- quick fix of error messages on Windows
+- use cordova-sqlite-evcore-free-dependencies@0.9.1 (with SQLite 3.28.0 update)
+
+#### cordova-sqlite-storage-commoncore 1.0.0
+
+- additional EU string manipulation test cases
+
+### cordova-sqlite-evcore-common-free 0.0.4
+
+- Use cordova-sqlite-evcore-free-dependencies 0.8.6, with workaround for 4-byte UTF-8 crash bug and fix for Samaritan character crash bug on Android
+
+#### cordova-sqlite-storage 2.5.1
+
+- fix internal plugin cleanup error log on Android
+
+#### cordova-sqlite-storage 2.5.0
+
+- androidDatabaseProvider: 'system' setting, to replace androidDatabaseImplementation setting which is now deprecated
+
+### cordova-sqlite-evcore-common-free 0.0.3
+
+- Internal error message fix for evcore on Android
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.1.4
 

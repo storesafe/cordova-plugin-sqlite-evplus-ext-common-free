@@ -1060,7 +1060,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .true.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .true.: syntax error/);
             else
@@ -1090,7 +1090,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .false.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .false.: syntax error/);
             else
@@ -1120,7 +1120,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .Infinity.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .Infinity.: syntax error/);
             else
@@ -1150,7 +1150,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .-.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .-.: syntax error/);
             else
@@ -1180,7 +1180,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .NaN.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .NaN.: syntax error/);
             else
@@ -1210,7 +1210,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .SLCT.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .SLCT.: syntax error/);
             else
@@ -1240,7 +1240,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .SLCT.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .SLCT.: syntax error/);
             else
@@ -1489,7 +1489,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: near .SELCT.: syntax error/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: near .SELCT.: syntax error/);
             else
@@ -1515,7 +1515,7 @@ var mytests = function() {
               expect(error.code).toBe(5);
 
             if (isWindows)
-              expect(error.message).toMatch(/Error preparing an SQLite statement/);
+              expect(error.message).toMatch(/Error preparing SQLite statement - with message: no such function: uper/);
             else if (isAndroid && !isImpl2)
               expect(error.message).toMatch(/syntax error or other error.code: 1.message: no such function: uper/);
             else
@@ -1527,28 +1527,27 @@ var mytests = function() {
             // and finish this test:
             db.close(done, done);
           });
-        });
+        }, MYTIMEOUT);
 
       });
 
       describe(pluginScenarioList[i] + ': additional db.executeSql test(s)', function() {
 
         it(suiteName + 'PRAGMA & multiple database transaction combination test', function(done) {
-          var db = openDatabase('DB1');
-
+          var db1 = openDatabase('DB1');
           var db2 = openDatabase('DB2');
 
-          // Replacement for QUnit stop()/start() functions:
+          // From QUnit replacement:
           var checkCount = 0;
           var expectedCheckCount = 2;
 
-          db.transaction(function(tx) {
+          db1.transaction(function(tx) {
             tx.executeSql('DROP TABLE IF EXISTS test_table');
             tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY, data TEXT, data_num INTEGER)');
 
             ++expectedCheckCount;
 
-            db.executeSql('PRAGMA table_info (test_table);', [], function(resultSet) {
+            db1.executeSql('PRAGMA table_info (test_table);', [], function(resultSet) {
               ++checkCount;
 
               expect(resultSet).toBeDefined();
@@ -1573,7 +1572,7 @@ var mytests = function() {
             tx.executeSql('DROP TABLE IF EXISTS tt2');
             tx.executeSql('CREATE TABLE IF NOT EXISTS tt2 (id2 INTEGER PRIMARY KEY, data2 TEXT, data_num2 INTEGER)');
 
-            db.executeSql('PRAGMA table_info (test_table);', [], function(resultSet) {
+            db1.executeSql('PRAGMA table_info (test_table);', [], function(resultSet) {
               ++checkCount;
 
               expect(resultSet).toBeDefined();
@@ -1593,7 +1592,8 @@ var mytests = function() {
               expect(resultRow3).toBeDefined();
               expect(resultRow3.name).toBe('data_num');
 
-              if (checkCount === expectedCheckCount) db.close(done, done);
+              // From QUnit replacement:
+              if (checkCount === expectedCheckCount) done();
             });
 
             db2.executeSql("PRAGMA table_info (tt2);", [], function(resultSet) {
@@ -1616,10 +1616,11 @@ var mytests = function() {
               expect(resultRow3).toBeDefined();
               expect(resultRow3.name).toBe('data_num2');
 
-              if (checkCount === expectedCheckCount) db.close(done, done);
+              // From QUnit replacement:
+              if (checkCount === expectedCheckCount) done();
             });
           });
-        });
+        }, MYTIMEOUT);
 
       });
 
