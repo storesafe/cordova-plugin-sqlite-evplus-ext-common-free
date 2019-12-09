@@ -1165,7 +1165,7 @@ var mytests = function() {
           });
         }, MYTIMEOUT);
 
-        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [XXX SKIP FINAL SELECT CHECK on iOS/macOS (evplus only) due to KNOWN CRASH; Plugin BROKEN: missing result column data; XXX KNOWN SELECT BLOB value ISSUE Windows/XXX]", function(done) {
+        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [XXX PLUGIN ISSUES REPRODUCED: SELECT BLOB returns data with incorrect length on Android (default evcore NDK implementation); SELECT BLOB VALUE ERROR on Android (androidDatabaseProvider: 'system') & Windows; MISSING result data column on iOS/macOS; actual result value is IGNORED on (WebKit) Web SQL & plugin on other platforms]", function(done) {
           var db = openDatabase('INSERT-inline-BLOB-value-FFD1FFD2-and-check-stored-data.db', '1.0', 'Demo', DEFAULT_SIZE);
 
           db.transaction(function(tx) {

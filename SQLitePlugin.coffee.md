@@ -224,6 +224,7 @@
         # (done)
 
       else
+        # openDatabase step 1:
         console.log 'OPEN database: ' + @dbname
 
         opensuccesscb = (fjinfo) =>
@@ -667,7 +668,6 @@
         for resultIndex in [0 .. result.length-1]
           r = result[resultIndex]
           type = r.type
-          # NOTE: r.qid ignored (if present)
           res = r.result
 
           q = mycbmap[resultIndex]
