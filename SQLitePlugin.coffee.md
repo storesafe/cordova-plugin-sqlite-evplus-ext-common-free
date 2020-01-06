@@ -548,6 +548,9 @@
 
       flatlist.push 'extra'
 
+      check1 = false
+      rrr = []
+
       mycb = (result) ->
         i = 0
         ri = 0
@@ -628,9 +631,26 @@
 
         return
 
+      mycb2 = (result) ->
+        if result.length is 0
+          # TBD just in case:
+          return mycb(rrr)
+        else if result[0] is "multi"
+          check1 = true
+        else if result[0] is null
+          if check1
+            return mycb(rrr)
+        else
+          if check1
+            # TBD ISSUE with result.slice(-1) on Android 4.4
+            # rrr = rrr.concat(result.slice(-1))
+            rrr = rrr.concat(result.slice(0, result.length-1))
+          else
+            return mycb(result)
+
       # NOTE: flatlist.length is needed internally for the JSON decoding.
       if @db.dbid isnt -1
-        cordova.exec mycb, null, "SQLitePlugin", "fj:#{flatlist.length};extra", flatlist
+        cordova.exec mycb2, null, "SQLitePlugin", "fj:#{flatlist.length};extra", flatlist
 
       else
         cordova.exec mycb, null, "SQLitePlugin", "fj",

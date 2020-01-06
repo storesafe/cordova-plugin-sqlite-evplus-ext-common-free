@@ -465,11 +465,13 @@ Contact for commercial license: sales@litehelpers.net
   };
 
   SQLitePluginTransaction.prototype.run_batch_flatjson = function(batchExecutesLength, flatBatchExecutes, handlerFor) {
-    var flatlist, mycb;
+    var check1, flatlist, mycb, mycb2, rrr;
     this.db.dbid = this.db.dbidmap[this.db.dbname];
     flatlist = [this.db.dbid, batchExecutesLength];
     flatlist = flatlist.concat(flatBatchExecutes);
     flatlist.push('extra');
+    check1 = false;
+    rrr = [];
     mycb = function(result) {
       var c, changes, code, errormessage, i, insert_id, j, k, r, ri, rl, row, rows, v;
       i = 0;
@@ -543,8 +545,25 @@ Contact for commercial license: sales@litehelpers.net
         ++i;
       }
     };
+    mycb2 = function(result) {
+      if (result.length === 0) {
+        return mycb(rrr);
+      } else if (result[0] === "multi") {
+        return check1 = true;
+      } else if (result[0] === null) {
+        if (check1) {
+          return mycb(rrr);
+        }
+      } else {
+        if (check1) {
+          return rrr = rrr.concat(result.slice(0, result.length - 1));
+        } else {
+          return mycb(result);
+        }
+      }
+    };
     if (this.db.dbid !== -1) {
-      cordova.exec(mycb, null, "SQLitePlugin", "fj:" + flatlist.length + ";extra", flatlist);
+      cordova.exec(mycb2, null, "SQLitePlugin", "fj:" + flatlist.length + ";extra", flatlist);
     } else {
       cordova.exec(mycb, null, "SQLitePlugin", "fj", [
         {

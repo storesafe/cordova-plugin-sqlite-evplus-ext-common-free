@@ -391,13 +391,13 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void open(File dbFile) throws Exception {
             if (!isNativeLibLoaded) {
-                System.loadLibrary("sqlc-evcore-native-driver");
+                System.loadLibrary("sqlc-evplus-native-driver");
                 isNativeLibLoaded = true;
             }
 
-            mydbhandle = EVCoreNativeDriver.sqlc_evcore_db_open(EVCoreNativeDriver.SQLC_EVCORE_API_VERSION,
+            mydbhandle = EVPlusNativeDriver.sqlc_evplus_db_open(EVPlusNativeDriver.SQLC_EVPLUS_API_VERSION,
               dbFile.getAbsolutePath(),
-              EVCoreNativeDriver.SQLC_OPEN_READWRITE | EVCoreNativeDriver.SQLC_OPEN_CREATE);
+              EVPlusNativeDriver.SQLC_OPEN_READWRITE | EVPlusNativeDriver.SQLC_OPEN_CREATE);
 
             if (mydbhandle < 0) throw new SQLException("open error", "failed", -(int)mydbhandle);
         }
@@ -408,7 +408,7 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void closeDatabaseNow() {
             try {
-                if (mydbhandle > 0) EVCoreNativeDriver.sqlc_db_close(mydbhandle);
+                if (mydbhandle > 0) EVPlusNativeDriver.sqlc_db_close(mydbhandle);
             } catch (Exception e) {
                 Log.e(SQLitePlugin.class.getSimpleName(), "couldn't close database, ignoring", e);
             }
@@ -420,12 +420,11 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void bugWorkaround() { }
 
-        String flatBatchJSON(String batch_json, int ll) {
-            long ch = EVCoreNativeDriver.sqlc_evcore_db_new_qc(mydbhandle);
-            String jr = EVCoreNativeDriver.sqlc_evcore_qc_execute(ch, batch_json, ll);
-            EVCoreNativeDriver.sqlc_evcore_qc_finalize(ch);
-            return jr;
+        /* ** NOT USED in this plugin version:
+        String flatBatchJSON(...) {
+            // ...
         }
+        // ** */
     }
 
     private class DBRunner implements Runnable {
@@ -476,7 +475,30 @@ public class SQLitePlugin extends CordovaPlugin {
                     if (oldImpl) {
                         mydb.executeSqlBatch(dbq.queries, dbq.jsonparams, dbq.cbc);
                     } else {
-                        dbq.cbc.sendPluginResult(new MyPluginResult(mydb1.flatBatchJSON(dbq.fj, dbq.ll)));
+                        final long qc = EVPlusNativeDriver.sqlc_evplus_db_new_qc(mydb1.mydbhandle);
+
+                        final String jr1 = EVPlusNativeDriver.sqlc_evplus_qc_execute(qc, dbq.fj);
+                        final boolean multi = jr1.charAt(2) == 'm';
+                        final PluginResult pr1 = new MyPluginResult(jr1);
+                        if (multi) {
+                            pr1.setKeepCallback(true);
+                        }
+                        dbq.cbc.sendPluginResult(pr1);
+
+                        boolean more = multi;
+
+                        while (more) {
+                            final String jr2 = EVPlusNativeDriver.sqlc_evplus_qc_execute(qc, "");
+                            more = jr2.charAt(1) != 'n';
+                            final PluginResult pr2 = new MyPluginResult(jr2);
+                            if (more) {
+                                pr2.setKeepCallback(true);
+                            }
+                            dbq.cbc.sendPluginResult(pr2);
+                        }
+
+                        // cleanup:
+                        EVPlusNativeDriver.sqlc_evplus_qc_finalize(qc);
                     }
 
                     if (this.oldImpl && this.bugWorkaround && dbq.queries.length == 1 && dbq.queries[0] == "COMMIT")

@@ -1,5 +1,9 @@
 # Changes
 
+## cordova-plugin-sqlite-evplus-ext-common-free 0.3.0-rc01
+
+- use cordova-sqlite-evplus-ext-free-dependencies with Android-sqlite-evplus-ext-native-driver-free, with workaround for large SELECT results on Android
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.2.0
 
 ### cordova-sqlite-evcore-commoncore-free 0.1.0-rc1

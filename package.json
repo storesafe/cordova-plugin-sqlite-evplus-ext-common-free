@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-sqlite-evplus-ext-common-free",
-  "version": "0.2.0",
-  "description": "Cordova/PhoneGap sqlite storage - free enterprise version with premium performance improvements for Android (evplus common version with external sqlite3 dependencies)",
+  "version": "0.3.0-rc01",
+  "description": "Cordova/PhoneGap sqlite storage - free evplus enterprise version with premium stability and performance improvements including workaround for large SELECT results on Android (version with external sqlite3 dependencies)",
   "cordova": {
     "id": "cordova-plugin-sqlite-evplus-ext-common-free",
     "platforms": [
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free",
   "dependencies": {
-    "cordova-sqlite-evcore-free-dependencies": "0.9.2"
+    "cordova-sqlite-evplus-ext-free-dependencies": "github:brodybits/cordova-sqlite-evplus-ext-free-dependencies#0.1.0-rc01"
   },
   "scripts": {
     "clean-spec": "rm -rf spec/[mnp]* && git cl spec/config.xml && git status --ignored",
