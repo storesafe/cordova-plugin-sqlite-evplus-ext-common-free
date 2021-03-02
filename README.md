@@ -253,6 +253,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
 
 ## Announcements
 
+- Custom Android database location (supports external storage directory)
 - This plugin version branch includes premium improvements to the internal JSON interface between Javascript and native parts on Android, iOS, and macOS which improves the performance and resolves memory issues in case of some very large SQL batches and large SELECT results.
 - This plugin version includes additional JavaScript performance enhancements with special benefit for Android.
 - This plugin version includes the following extra (non-standard) features: BASE 64 (all platforms Android/iOS/macOS/Windows), REGEXP (Android/iOS/macOS)
@@ -851,6 +852,32 @@ where the `iosDatabaseLocation` option may be set to one of the following choice
 - `default`: `Library/LocalDatabase` subdirectory - *NOT* visible to iTunes and *NOT* backed up by iCloud
 - `Library`: `Library` subdirectory - backed up by iCloud, *NOT* visible to iTunes
 - `Documents`: `Documents` subdirectory - visible to iTunes and backed up by iCloud
+
+To specify a external or another custom Android database location, with help from cordova-plugin-file:
+
+```js
+window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function(externalDataDirectoryEntry) {
+  var db = window.sqlitePlugin.openDatabase({name: 'external.db', androidDatabaseLocation: externalDataDirectoryEntry.toURL()});
+
+  db.transaction(function(tx) {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS MyTable (data)');
+    tx.executeSql('INSERT INTO MyTable VALUES (?)', ['test-value']);
+  }, function(error) {
+    console.log('Populate database error: ' + error.message);
+
+  }, function() {
+    db.transaction(function(tx) {
+      tx.executeSql('SELECT data from MyTable', [], function(tx_ignored, resultSet) {
+        console.log('Record count: ' + resultSet.rows.length);
+        for (var i=0; i<resultSet.rows.length; ++i)
+          console.log('index: ' + i + ' value: ' + resultSet.rows.item(i).data);
+      });
+    }, function(error) {
+      console.log('Populate database error: ' + error.message);
+    });
+  });
+});
+```
 
 **WARNING:** Again, the new "default" iosDatabaseLocation value is *NOT* the same as the old default location and would break an upgrade for an app using the old default value (0) on iOS.
 
