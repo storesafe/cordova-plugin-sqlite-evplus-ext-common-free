@@ -819,13 +819,13 @@
           throw newSQLError 'Database name value is missing in openDatabase call'
 
         if !openargs.iosDatabaseLocation and !openargs.location and openargs.location isnt 0 and !openargs.androidDatabaseLocation
-          throw newSQLError 'Database location (or iosDatabaseLocation or androidDatabaseLocation) value is now mandatory in openDatabase call'
+          throw newSQLError 'Database location (or iosDatabaseLocation or androidDatabaseLocation) setting is now mandatory in openDatabase call.'
 
         if !!openargs.location and !!openargs.iosDatabaseLocation
           throw newSQLError 'AMBIGUOUS: both location and iosDatabaseLocation settings are present in openDatabase call. Please use either setting, not both.'
 
         if !!openargs.location and !!openargs.androidDatabaseLocation
-          throw newSQLError 'AMBIGUOUS: both location or androidDatabaseLocation values are present in openDatabase call'
+          throw newSQLError 'AMBIGUOUS: both location and androidDatabaseLocation settings are present in openDatabase call. Please use either setting, not both. But you *can* use androidDatabaseLocation and iosDatabaseLocation together.'
 
         dblocation =
           if !!openargs.location and openargs.location is 'default'
@@ -901,13 +901,13 @@
           #args.dblocation = dblocation || dblocations[2]
 
         if !first.iosDatabaseLocation and !first.location and first.location isnt 0 and !first.androidDatabaseLocation
-          throw newSQLError 'Database location (or iosDatabaseLocation or androidDatabaseLocation) value is now mandatory in deleteDatabase call'
+          throw newSQLError 'Database location (or iosDatabaseLocation or androidDatabaseLocation) setting is now mandatory in deleteDatabase call.'
 
         if !!first.location and !!first.iosDatabaseLocation
           throw newSQLError 'AMBIGUOUS: both location and iosDatabaseLocation settings are present in deleteDatabase call. Please use either setting value, not both.'
 
         if !!first.location and !!first.androidDatabaseLocation
-          throw newSQLError 'AMBIGUOUS: both location or androidDatabaseLocation values are present in deleteDatabase call'
+          throw newSQLError 'AMBIGUOUS: both location and androidDatabaseLocation settings are present in deleteDatabase call. Please use either setting, not both. But you *can* use androidDatabaseLocation and iosDatabaseLocation together.'
 
         dblocation =
           if !!first.location and first.location is 'default'
