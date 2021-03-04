@@ -1,5 +1,7 @@
 # Changes
 
+## cordova-sqlite-evplus-feat-android-db-location 0.0.2-dev
+
 ## cordova-sqlite-evplus-feat-android-db-location 0.0.1-dev
 
 ### cordova-sqlite-evcore-feature-android-db-location 0.7.2-dev1
