@@ -1165,7 +1165,7 @@ var mytests = function() {
           });
         }, MYTIMEOUT);
 
-        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [XXX PLUGIN ISSUES REPRODUCED: SELECT BLOB returns data with incorrect length on Android (default evcore NDK implementation); SELECT BLOB VALUE ERROR on Android (androidDatabaseProvider: 'system') & Windows; MISSING result data column on iOS/macOS; actual result value is IGNORED on (WebKit) Web SQL & plugin on other platforms]", function(done) {
+        it(suiteName + "INSERT inline BLOB value (X'FFD1FFD2') and check stored data [XXX KNOWN PLUGIN ISSUES: SELECT BLOB returns data with incorrect length on Android (default evplus NDK implementation); SELECT BLOB VALUE ERROR on Android (androidDatabaseProvider: 'system') & Windows; actual result value is IGNORED on (WebKit) Web SQL & plugin on other platforms]", function(done) {
           var db = openDatabase('INSERT-inline-BLOB-value-FFD1FFD2-and-check-stored-data.db', '1.0', 'Demo', DEFAULT_SIZE);
 
           db.transaction(function(tx) {
@@ -1202,14 +1202,14 @@ var mytests = function() {
                     var mydata = item.data;
 
                     if (!isWebSql && (isAppleMobileOS || isMac)) {
-                      // MISSING RESULT COLUMN DATA REPRODUCED on iOS/macOS plugin:
-                      expect(mydata).not.toBeDefined();
+                      // NOT EXPECTED TO GET HERE on iOS/macOS plugin [evplus]:
+                      done.fail();
                     } else {
                       // EXPECTED RESULT on (WebKit) Web SQL & FUTURE TBD: plugin on browser platform
                       expect(mydata).toBeDefined();
                       expect(mydata.length).toBeDefined();
                       if (!isWebSql && isAndroid && !isImpl2)
-                        expect(mydata.length).toBe(1); // INCORRECT DATA LENGTH on Android (default evcore NDK)
+                        expect(mydata.length).toBe(1); // INCORRECT DATA LENGTH REPRODUCED on Android (default evplus NDK)
                       else
                       if (!(isWebSql && /Android 4.[1-3]/.test(navigator.userAgent)))
                         expect(mydata.length).toBe(4);
