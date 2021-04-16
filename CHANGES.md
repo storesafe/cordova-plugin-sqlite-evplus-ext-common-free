@@ -2,6 +2,13 @@
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.5.0-dev
 
+- updates from cordova-sqlite-evplus-ext-free-dependencies 0.2.0-rc01
+  - BREAKING: drop Android pre-5.1 support
+  - update SQLite to 3.35.4
+  - fix for emojis and other 4-byte UTF-8 characters on Android
+  - update affected test cases
+  - update documentation
+
 ### cordova-sqlite-evcore-commoncore-free 0.3.0
 
 ### cordova-sqlite-ext-common 4.0.0
