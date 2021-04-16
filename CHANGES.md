@@ -2,6 +2,22 @@
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.5.0-dev
 
+### cordova-sqlite-evcore-commoncore-free 0.3.0
+
+### cordova-sqlite-ext-common 4.0.0
+
+### cordova-sqlite-storage-commoncore 2.0.0
+
+- refactor: clean up imports for Android
+- Fix plugin param name for macOS ("osx") - *tested* with Cordova 9 and cordova-osx@5
+- Drop support for Windows on ARM (Windows Mobile)
+
+#### cordova-sqlite-storage 5.0.1
+
+- enable RENAME table with view test - from December 2019 SQLite crash report, fixed in 2020 ref:
+  - http://sqlite.1065341.n5.nabble.com/Crash-Bug-Report-tc109903.html
+  - https://github.com/xpbrew/cordova-sqlite-storage/issues/904
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.4.1-rc01
 
 - SQLite 3.32.3 update from github:brodybits/cordova-sqlite-evplus-ext-free-dependencies#0.1.0-rc02
@@ -37,7 +53,7 @@
 
 #### cordova-sqlite-storage 3.4.1
 
-- SQLite 3.31.1 update from cordova-sqlite-storage-dependencies@2.1.1
+- SQLite 3.30.1 update from cordova-sqlite-storage-dependencies@2.1.1
 
 #### cordova-sqlite-storage 3.4.0
 
