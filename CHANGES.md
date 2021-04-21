@@ -1,6 +1,6 @@
 # Changes
 
-## cordova-plugin-sqlite-evplus-ext-common-free 0.5.0-dev
+## cordova-plugin-sqlite-evplus-ext-common-free 0.5.0-pre01
 
 - updates from cordova-sqlite-evplus-ext-free-dependencies 0.2.0-rc01
   - BREAKING: drop Android pre-5.1 support
