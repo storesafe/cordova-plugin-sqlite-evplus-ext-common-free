@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free",
   "dependencies": {
-    "cordova-sqlite-evplus-ext-free-dependencies": "github:brodybits/cordova-sqlite-evplus-ext-free-dependencies#0.2.0-rc01"
+    "cordova-sqlite-evplus-ext-free-dependencies": "0.3.0"
   },
   "scripts": {
     "clean-spec": "rm -rf spec/[mnp]* && git cl spec/config.xml spec/package.json && git status --ignored",

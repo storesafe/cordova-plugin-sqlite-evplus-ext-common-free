@@ -2,6 +2,8 @@
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.6.0-dev
 
+- update evplus NDK library - solution for Android 11 with target SDK 30, from cordova-sqlite-evplus-ext-free-dependencies@0.3.0
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.5.0-pre01
 
 - updates from cordova-sqlite-evplus-ext-free-dependencies 0.2.0-rc01

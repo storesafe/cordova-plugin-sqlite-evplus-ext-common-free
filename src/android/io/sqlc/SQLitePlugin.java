@@ -391,15 +391,17 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void open(File dbFile) throws Exception {
             if (!isNativeLibLoaded) {
-                System.loadLibrary("sqlc-evplus-native-driver");
+                System.loadLibrary("sqlc-evplus-ndk-driver");
                 isNativeLibLoaded = true;
             }
 
-            mydbhandle = EVPlusNativeDriver.sqlc_evplus_db_open(EVPlusNativeDriver.SQLC_EVPLUS_API_VERSION,
+            long mydboc = EVNDKDriver.sqlc_new_ev_dboc();
+            mydbhandle = EVNDKDriver.sqlc_ev_db_open(mydboc,
               dbFile.getAbsolutePath(),
-              EVPlusNativeDriver.SQLC_OPEN_READWRITE | EVPlusNativeDriver.SQLC_OPEN_CREATE);
-
-            if (mydbhandle < 0) throw new SQLException("open error", "failed", -(int)mydbhandle);
+              EVNDKDriver.SQLC_OPEN_READWRITE | EVNDKDriver.SQLC_OPEN_CREATE);
+            int openResult = EVNDKDriver.sqlc_ev_db_open_result(mydboc);
+            EVNDKDriver.sqlc_ev_dboc_finalize(mydboc);
+            if (mydbhandle == EVNDKDriver.SQLC_NULL_HANDLE) throw new SQLException("open error", "failed", openResult);
         }
 
         /**
@@ -408,7 +410,7 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void closeDatabaseNow() {
             try {
-                if (mydbhandle > 0) EVPlusNativeDriver.sqlc_db_close(mydbhandle);
+                if (mydbhandle > 0) EVNDKDriver.sqlc_db_close(mydbhandle);
             } catch (Exception e) {
                 Log.e(SQLitePlugin.class.getSimpleName(), "couldn't close database, ignoring", e);
             }
@@ -475,9 +477,9 @@ public class SQLitePlugin extends CordovaPlugin {
                     if (oldImpl) {
                         mydb.executeSqlBatch(dbq.queries, dbq.jsonparams, dbq.cbc);
                     } else {
-                        final long qc = EVPlusNativeDriver.sqlc_evplus_db_new_qc(mydb1.mydbhandle);
+                        final long qc = EVNDKDriver.sqlc_evplus_db_new_qc(mydb1.mydbhandle);
 
-                        final String jr1 = EVPlusNativeDriver.sqlc_evplus_qc_execute(qc, dbq.fj);
+                        final String jr1 = EVNDKDriver.sqlc_evplus_qc_execute(qc, dbq.fj);
                         final boolean multi = jr1.charAt(2) == 'm';
                         final PluginResult pr1 = new MyPluginResult(jr1);
                         if (multi) {
@@ -488,7 +490,7 @@ public class SQLitePlugin extends CordovaPlugin {
                         boolean more = multi;
 
                         while (more) {
-                            final String jr2 = EVPlusNativeDriver.sqlc_evplus_qc_execute(qc, "");
+                            final String jr2 = EVNDKDriver.sqlc_evplus_qc_execute(qc, "");
                             more = jr2.charAt(1) != 'n';
                             final PluginResult pr2 = new MyPluginResult(jr2);
                             if (more) {
@@ -498,7 +500,7 @@ public class SQLitePlugin extends CordovaPlugin {
                         }
 
                         // cleanup:
-                        EVPlusNativeDriver.sqlc_evplus_qc_finalize(qc);
+                        EVNDKDriver.sqlc_evplus_qc_finalize(qc);
                     }
 
                     if (this.oldImpl && this.bugWorkaround && dbq.queries.length == 1 && dbq.queries[0] == "COMMIT")
