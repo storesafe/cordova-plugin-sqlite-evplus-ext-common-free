@@ -410,7 +410,7 @@ public class SQLitePlugin extends CordovaPlugin {
         @Override
         void closeDatabaseNow() {
             try {
-                if (mydbhandle > 0) EVNDKDriver.sqlc_db_close(mydbhandle);
+                if (mydbhandle != EVNDKDriver.SQLC_NULL_HANDLE) EVNDKDriver.sqlc_db_close(mydbhandle);
             } catch (Exception e) {
                 Log.e(SQLitePlugin.class.getSimpleName(), "couldn't close database, ignoring", e);
             }

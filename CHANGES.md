@@ -2,6 +2,8 @@
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.7.0-dev
 
+- fix condition used to close database on Android
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.6.0-pre01
 
 - updates from cordova-sqlite-evplus-ext-free-dependencies@0.3.0
