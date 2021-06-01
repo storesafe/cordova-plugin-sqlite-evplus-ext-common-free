@@ -531,8 +531,8 @@ var mytests = function() {
           });
         }, MYTIMEOUT);
 
-        // TBD ENCODING ISSUE iwth emojis and other 4-octet UTF-8 characters
-        // on Android (default Android evcore NDK implementation)
+        // ENCODING ISSUE NOW FIXED with emojis and other 4-byte UTF-8 characters
+        // on default Android evcore NDK implementation
         // ref:
         // - litehelpers/Cordova-sqlite-evcore-extbuild-free#44
         // - litehelpers/Cordova-sqlite-storage#564
@@ -556,9 +556,9 @@ var mytests = function() {
                   var row = rs2.rows.item(0);
                   // [evplus] NOW FIXED (...)
                   // Full object check:
-                    expect(row).toEqual({data: '@\uD83D\uDE03!'});
+                  expect(row).toEqual({data: '@\uD83D\uDE03!'});
                   // Check individual members:
-                    expect(row.data).toBe('@\uD83D\uDE03!');
+                  expect(row.data).toBe('@\uD83D\uDE03!');
 
                   tx.executeSql('SELECT HEX(data) AS hexvalue FROM test_table', [], function(tx_ignored, rs3) {
                     expect(rs3).toBeDefined();
@@ -591,7 +591,7 @@ var mytests = function() {
         // ref:
         // - litehelpers/Cordova-sqlite-evcore-extbuild-free#43
         // - litehelpers/Cordova-sqlite-storage#564
-        it(suiteName + 'INSERT TEXT string with 25 emojis, SELECT the data, and check - ENCODING ISSUE NOW FIXED on Android post-5.x [evplus]' , function(done) {
+        it(suiteName + 'INSERT TEXT string with 25 emojis, SELECT the data, and check' , function(done) {
           // ref:
           // - litehelpers/Cordova-sqlite-evcore-extbuild-free#44
           // - litehelpers/Cordova-sqlite-storage#564
@@ -614,8 +614,7 @@ var mytests = function() {
                   expect(rs2.rows.length).toBe(1);
 
                   var row = rs2.rows.item(0);
-                  // [evplus] NOW FIXED (...)
-                    expect(row.data).toBe(part + part + part + part + part);
+                  expect(row.data).toBe(part + part + part + part + part);
 
                   // Close (plugin only) & finish:
                   (isWebSql) ? done() : db.close(done, done);

@@ -423,8 +423,11 @@ public class SQLitePlugin extends CordovaPlugin {
         void bugWorkaround() { }
 
         /* ** NOT USED in this plugin version:
-        String flatBatchJSON(...) {
-            // ...
+        String flatBatchJSON(String batch_json, int ll) {
+            long ch = EVNDKDriver.sqlc_evcore_db_new_qc(mydbhandle);
+            String jr = EVNDKDriver.sqlc_evcore_qc_execute(ch, batch_json, ll);
+            EVNDKDriver.sqlc_evcore_qc_finalize(ch);
+            return jr;
         }
         // ** */
     }

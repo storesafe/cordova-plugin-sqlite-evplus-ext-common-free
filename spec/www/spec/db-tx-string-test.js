@@ -1472,7 +1472,7 @@ var mytests = function() {
           });
         }, MYTIMEOUT);
 
-        // TBD KNOWN ENCODING ISSUE NOW FIXESD with emojis and other 4-byte UTF-8 characters
+        // ENCODING ISSUE NOW FIXED with emojis and other 4-byte UTF-8 characters
         // on default Android [evplus] NDK implementation
         // ref:
         // - litehelpers/Cordova-sqlite-evcore-extbuild-free#44
@@ -1542,15 +1542,13 @@ var mytests = function() {
               expect(rs1).toBeDefined();
               expect(rs1.rows).toBeDefined();
               expect(rs1.rows.length).toBe(1);
-              // [evplus] NOW FIXED (...)
-                expect(rs1.rows.item(0).myresult).toBe('A𐌱');
+              expect(rs1.rows.item(0).myresult).toBe('A𐌱');
 
               tx.executeSql("SELECT UPPER('a𐌱') AS myresult", null, function(ignored, rs2) {
                 expect(rs2).toBeDefined();
                 expect(rs2.rows).toBeDefined();
                 expect(rs2.rows.length).toBe(1);
-                // [evplus] NOW FIXED (...)
-                  expect(rs2.rows.item(0).myresult).toBe('A𐌱');
+                expect(rs2.rows.item(0).myresult).toBe('A𐌱');
 
                 // Close (plugin only) & finish:
                 (isWebSql) ? done() : db.close(done, done);
@@ -1566,6 +1564,8 @@ var mytests = function() {
         }, MYTIMEOUT);
 
         it(suiteName + "SELECT LOWER(X'41F0908CB1') - RETURNS '\\uF041\\u8C90' ('\uF041\u8C90') UTF-16le on Android 4.1-4.3 (WebKit) Web SQL & Windows, UTF-8 'a\\uD800\\uDF31' ('a\uD800\uDF31') otherwise - ENCODING ISSUE NOW FIXED on default Android SQLite3 NDK [evplus] implementation", function(done) {
+          // ENCODING ISSUE NOW FIXED with emojis and other 4-byte UTF-8 characters
+          // on default Android evcore NDK implementation
           // ref:
           // - litehelpers/Cordova-sqlite-evcore-extbuild-free#44
           // - litehelpers/Cordova-sqlite-storage#564
@@ -1646,8 +1646,7 @@ var mytests = function() {
               expect(rs).toBeDefined();
               expect(rs.rows).toBeDefined();
               expect(rs.rows.length).toBe(1);
-              // [evplus] NOW FIXED (...)
-                expect(rs.rows.item(0).uppertext).toBe('A\uD83D\uDE03.');
+              expect(rs.rows.item(0).uppertext).toBe('A\uD83D\uDE03.');
 
               // Close (plugin only) & finish:
               (isWebSql) ? done() : db.close(done, done);
@@ -1677,8 +1676,7 @@ var mytests = function() {
               expect(rs.rows).toBeDefined();
               expect(rs.rows.length).toBe(1);
 
-              // [evplus] NOW FIXED
-                expect(rs.rows.item(0).uppertext).toBe('A\uD83D\uDE03.');
+              expect(rs.rows.item(0).uppertext).toBe('A\uD83D\uDE03.');
 
               // Close (plugin only) & finish:
               (isWebSql) ? done() : db.close(done, done);
@@ -1693,8 +1691,8 @@ var mytests = function() {
         }, MYTIMEOUT);
 
         it(suiteName + 'emoji HEX test: SELECT HEX("@\\uD83D\\uDE03!") [\\u1F603 SMILING FACE (MOUTH OPEN)] [ENCODING ISSUE NOW FIXED on Android post-5.x [evplus]; default sqlite HEX encoding: UTF-6le on Windows & Android 4.1-4.3 (WebKit) Web SQL, UTF-8 otherwise]', function(done) {
-          // ENCODING ISSUE REPRODUCED for emojis and other 4-byte UTF-8
-          // characters on default Android evcore NDK implementation
+          // ENCODING ISSUE NOW FIXED with emojis and other 4-byte UTF-8 characters
+          // on default Android evcore NDK implementation
           // ref:
           // - litehelpers/Cordova-sqlite-evcore-extbuild-free#44
           // - litehelpers/Cordova-sqlite-storage#564
@@ -2160,8 +2158,7 @@ var mytests = function() {
               var resultRow1 = rs1.rows.item(0);
               expect(resultRow1).toBeDefined();
               expect(resultRow1.upperText).toBeDefined();
-              // [evplus] NOW FIXED (...)
-                expect(resultRow1.upperText).toBe(
+              expect(resultRow1.upperText).toBe(
                   'A\uD83D\uDE01\uD83D\uDE02\uD83D\uDE03\uD83D\uDE04\uD83D\uDE05' +
                   'A\uD83D\uDE01\uD83D\uDE02\uD83D\uDE03\uD83D\uDE04\uD83D\uDE05' +
                   'A\uD83D\uDE01\uD83D\uDE02\uD83D\uDE03\uD83D\uDE04\uD83D\uDE05' +

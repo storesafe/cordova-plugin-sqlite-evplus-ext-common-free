@@ -4,6 +4,10 @@
 
 - fix condition used to close database on Android
 
+### cordova-sqlite-evcore-common-free 0.6.0-dev
+
+- update Windows minimum & target platform versions - BREAKING CHANGE
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.6.0-pre01
 
 - updates from cordova-sqlite-evplus-ext-free-dependencies@0.3.0
