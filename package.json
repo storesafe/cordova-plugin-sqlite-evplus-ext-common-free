@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free.git"
+    "url": "https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free.git"
   },
   "keywords": [
     "sqlite",
@@ -26,11 +26,11 @@
   "author": "various",
   "license": "GPL-3.0 OR Commercial",
   "bugs": {
-    "url": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free/issues"
+    "url": "https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free/issues"
   },
-  "homepage": "https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free",
+  "homepage": "https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free",
   "dependencies": {
-    "cordova-sqlite-evplus-ext-free-dependencies": "github:brodybits/cordova-sqlite-evplus-ext-free-dependencies#0.1.0-rc02"
+    "cordova-sqlite-evplus-ext-free-dependencies": "0.4.1"
   },
   "scripts": {
     "clean-spec": "rm -rf spec/[mnp]* && git cl spec/config.xml spec/package.json && git status --ignored",
