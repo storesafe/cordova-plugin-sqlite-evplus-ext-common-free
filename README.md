@@ -390,6 +390,7 @@ Use of this plugin on the Windows platform is not always straightforward, due to
 Use the following command to install this plugin version using the Cordova CLI:
 
 ```shell
+# XXX TODO UPDATE NEEDED HERE:
 cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # --save *recommended* for Cordova CLI pre-7.0
 ```
 
@@ -1476,6 +1477,7 @@ Other resource (apparently for Ionic 1): <https://www.packtpub.com/books/content
 ## Easy installation with Cordova CLI tool
 
 ```shell
+# XXX TODO XXX XXX
 cordova plugin add https://github.com/litehelpers/cordova-plugin-sqlite-evplus-ext-common-free # --save *recommended* for Cordova CLI pre-7.0
 ```
 
