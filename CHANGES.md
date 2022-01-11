@@ -1,10 +1,20 @@
 # Changes
 
+## cordova-sqlite-evplus-feat-android-db-location 0.0.4-dev-wip
+
+## cordova-plugin-sqlite-evplus-ext-common-free 0.8.0-rc03
+
+- SQLite 3.37.2 update from cordova-sqlite-evplus-ext-free-dependencies@0.4.2
+
 ## cordova-sqlite-evplus-feat-android-db-location 0.0.3-dev
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.8.0-rc02
 
 - SQLite 3.36.0 update from cordova-sqlite-evplus-ext-free-dependencies@0.4.1
+
+NOTE: "ALTER TABLE DROP COLUMN corrupts data" issue seems to have been resolved in SQLite 3.35.5 as well:
+  - https://sqlite.org/forum/forumpost/8f5073c5a9d6d9b3?t=h
+  - https://sqlite.org/releaselog/3_35_5.html
 
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.8.0-rc01
 
