@@ -1,5 +1,9 @@
 # Changes
 
+## cordova-plugin-sqlite-evplus-ext-common-free 0.9.0-rc01
+
+- SQLite 3.38.5 update from cordova-sqlite-evplus-ext-free-dependencies@0.5.0
+
 ## cordova-plugin-sqlite-evplus-ext-common-free 0.8.0-rc03
 
 - SQLite 3.37.2 update from cordova-sqlite-evplus-ext-free-dependencies@0.4.2
