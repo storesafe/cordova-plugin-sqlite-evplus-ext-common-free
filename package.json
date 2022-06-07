@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free",
   "dependencies": {
-    "cordova-sqlite-evplus-ext-free-dependencies": "0.4.1"
+    "cordova-sqlite-evplus-ext-free-dependencies": "0.4.2"
   },
   "scripts": {
     "clean-spec": "rm -rf spec/[mnp]* && git cl spec/config.xml spec/package.json && git status --ignored",
